@@ -1,8 +1,6 @@
-import React, { Suspense, useEffect, useState } from "react";
-import Loader from "../components/Loader/Loader";
-import { isConnectionError, useConnection } from "../hooks/useConnection";
-import { ApiResponse } from "../types/index";
+import { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
+import Loader from "../components/Loader/Loader";
 
 // type Exercise = {
 //   id: number;
@@ -30,10 +28,13 @@ export default function RoutesPage() {
   // }, [connection]);
 
   return (
-    <Suspense fallback={<Loader />}>
-      <Routes>
-        <Route path="/login"></Route>
-      </Routes>
-    </Suspense>
+    // <Suspense fallback={<Loader />}>
+    <Routes>
+      <Route
+        path="/"
+        element={<h1>hola</h1>}
+      />
+    </Routes>
+    // </Suspense>
   );
 }
