@@ -1,6 +1,4 @@
-import { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import Loader from "../components/Loader/Loader";
 
 // type Exercise = {
 //   id: number;
