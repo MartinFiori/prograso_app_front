@@ -1,0 +1,137 @@
+.container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.loaderBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.logo {
+  width: min(250px, 40vw);
+  height: auto;
+  overflow: visible;
+}
+
+.mark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: markFloat 1.8s ease-in-out infinite;
+}
+
+.word {
+  fill: #104093;
+}
+
+.letter {
+  fill: #104093;
+  opacity: 0;
+  animation: letterFade 1.5s ease-in-out infinite;
+}
+
+.ticketDots {
+  animation: dotsPulse 1.2s ease-in-out infinite;
+}
+
+.loaderStar {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: loaderStarPop 1.2s ease-in-out infinite;
+}
+
+.loaderSparks {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: loaderSparksPop 1.2s ease-in-out infinite;
+}
+
+.loadingText {
+  color: #104093;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  animation: textPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes markFloat {
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-4px) scale(1.015);
+  }
+}
+
+@keyframes letterFade {
+
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes dotsPulse {
+
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes loaderStarPop {
+
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  50% {
+    transform: scale(1.12) rotate(5deg);
+  }
+}
+
+@keyframes loaderSparksPop {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes textPulse {
+
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
