@@ -1,0 +1,769 @@
+/* =========================================================
+   PADEL APP — BASE TOKENS
+   Importar una sola vez desde el archivo principal de estilos.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. Paleta base SCSS
+   Estos colores sirven para cálculos y estilos compilados.
+   --------------------------------------------------------- */
+
+$padel-green-50: #effdf7;
+$padel-green-100: #d9fbea;
+$padel-green-200: #b5f5d7;
+$padel-green-300: #7ce9bb;
+$padel-green-400: #3bd49a;
+$padel-green-500: #16b77d;
+$padel-green-600: #0b9365;
+$padel-green-700: #087653;
+$padel-green-800: #095e45;
+$padel-green-900: #084e3b;
+$padel-green-950: #032c23;
+
+$ball-yellow-50: #fbffe5;
+$ball-yellow-100: #f5ffc2;
+$ball-yellow-200: #ecff87;
+$ball-yellow-300: #dfff00;
+$ball-yellow-400: #c8e600;
+$ball-yellow-500: #a4bf00;
+$ball-yellow-600: #7d9200;
+$ball-yellow-700: #626f06;
+$ball-yellow-800: #50590b;
+$ball-yellow-900: #434b0e;
+
+$blue-50: #eff8ff;
+$blue-100: #dbeefe;
+$blue-200: #bfe2fe;
+$blue-300: #93d1fd;
+$blue-400: #60b7fa;
+$blue-500: #3b9af5;
+$blue-600: #257de9;
+$blue-700: #1d65d6;
+$blue-800: #1e52ad;
+$blue-900: #1e4788;
+
+$red-50: #fff1f2;
+$red-100: #ffe4e6;
+$red-200: #fecdd3;
+$red-300: #fda4af;
+$red-400: #fb7185;
+$red-500: #f43f5e;
+$red-600: #e11d48;
+$red-700: #be123c;
+$red-800: #9f1239;
+$red-900: #881337;
+
+$orange-50: #fff7ed;
+$orange-100: #ffedd5;
+$orange-200: #fed7aa;
+$orange-300: #fdba74;
+$orange-400: #fb923c;
+$orange-500: #f97316;
+$orange-600: #ea580c;
+$orange-700: #c2410c;
+$orange-800: #9a3412;
+$orange-900: #7c2d12;
+
+$gray-0: #ffffff;
+$gray-50: #f8fafc;
+$gray-100: #f1f5f9;
+$gray-200: #e2e8f0;
+$gray-300: #cbd5e1;
+$gray-400: #94a3b8;
+$gray-500: #64748b;
+$gray-600: #475569;
+$gray-700: #334155;
+$gray-800: #1e293b;
+$gray-850: #172033;
+$gray-900: #0f172a;
+$gray-950: #020617;
+
+/* ---------------------------------------------------------
+   2. Tipografías
+   --------------------------------------------------------- */
+
+$font-family-primary: Inter,
+  "Segoe UI",
+  Roboto,
+  Helvetica,
+  Arial,
+  sans-serif;
+
+$font-family-heading: Inter,
+  "Segoe UI",
+  Roboto,
+  Helvetica,
+  Arial,
+  sans-serif;
+
+$font-family-monospace: "Fira Code",
+  "SFMono-Regular",
+  Consolas,
+  "Liberation Mono",
+  monospace;
+
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-md: 1rem; // 16px
+$font-size-lg: 1.125rem; // 18px
+$font-size-xl: 1.25rem; // 20px
+$font-size-2xl: 1.5rem; // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem; // 36px
+$font-size-5xl: 3rem; // 48px
+
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+$line-height-tight: 1.15;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.7;
+
+$letter-spacing-tight: -0.025em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.05em;
+
+/* ---------------------------------------------------------
+   3. Espaciado
+   --------------------------------------------------------- */
+
+$spacing-0: 0;
+$spacing-1: 0.25rem; // 4px
+$spacing-2: 0.5rem; // 8px
+$spacing-3: 0.75rem; // 12px
+$spacing-4: 1rem; // 16px
+$spacing-5: 1.25rem; // 20px
+$spacing-6: 1.5rem; // 24px
+$spacing-7: 1.75rem; // 28px
+$spacing-8: 2rem; // 32px
+$spacing-10: 2.5rem; // 40px
+$spacing-12: 3rem; // 48px
+$spacing-16: 4rem; // 64px
+$spacing-20: 5rem; // 80px
+$spacing-24: 6rem; // 96px
+
+/* ---------------------------------------------------------
+   4. Bordes y radios
+   --------------------------------------------------------- */
+
+$border-width: 1px;
+$border-width-medium: 2px;
+$border-width-heavy: 3px;
+
+$radius-none: 0;
+$radius-xs: 0.25rem;
+$radius-sm: 0.375rem;
+$radius-md: 0.5rem;
+$radius-lg: 0.75rem;
+$radius-xl: 1rem;
+$radius-2xl: 1.5rem;
+$radius-full: 9999px;
+
+/* ---------------------------------------------------------
+   5. Breakpoints
+   --------------------------------------------------------- */
+
+$breakpoint-xs: 360px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-2xl: 1440px;
+
+/* ---------------------------------------------------------
+   6. Contenedores
+   --------------------------------------------------------- */
+
+$container-sm: 540px;
+$container-md: 720px;
+$container-lg: 960px;
+$container-xl: 1180px;
+$container-2xl: 1360px;
+
+$page-padding-mobile: $spacing-4;
+$page-padding-tablet: $spacing-6;
+$page-padding-desktop: $spacing-8;
+
+/* ---------------------------------------------------------
+   7. Transiciones
+   --------------------------------------------------------- */
+
+$duration-fast: 120ms;
+$duration-normal: 200ms;
+$duration-slow: 350ms;
+$duration-slower: 500ms;
+
+$ease-default: ease;
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+$transition-colors: color $duration-normal $ease-out,
+  background-color $duration-normal $ease-out,
+  border-color $duration-normal $ease-out;
+
+$transition-transform: transform $duration-normal $ease-out;
+
+$transition-default: color $duration-normal $ease-out,
+  background-color $duration-normal $ease-out,
+  border-color $duration-normal $ease-out,
+  box-shadow $duration-normal $ease-out,
+  transform $duration-normal $ease-out;
+
+/* ---------------------------------------------------------
+   8. Z-index
+   --------------------------------------------------------- */
+
+$z-index-base: 0;
+$z-index-dropdown: 100;
+$z-index-sticky: 200;
+$z-index-header: 300;
+$z-index-overlay: 800;
+$z-index-modal: 900;
+$z-index-toast: 1000;
+$z-index-loader: 1100;
+$z-index-tooltip: 1200;
+
+/* ---------------------------------------------------------
+   9. Medidas frecuentes
+   --------------------------------------------------------- */
+
+$header-height: 64px;
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 76px;
+
+$input-height-sm: 36px;
+$input-height-md: 44px;
+$input-height-lg: 52px;
+
+$button-height-sm: 36px;
+$button-height-md: 44px;
+$button-height-lg: 52px;
+
+$touch-target-min: 44px;
+
+/* =========================================================
+   10. VARIABLES CSS — TEMA CLARO
+   Se utilizan en los componentes porque cambian en runtime.
+   ========================================================= */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Marca */
+
+  --color-primary: #{$padel-green-600};
+  --color-primary-hover: #{$padel-green-700};
+  --color-primary-active: #{$padel-green-800};
+  --color-primary-light: #{$padel-green-100};
+  --color-primary-soft: rgba(11, 147, 101, 0.1);
+  --color-primary-contrast: #{$gray-0};
+
+  --color-accent: #{$ball-yellow-300};
+  --color-accent-hover: #{$ball-yellow-400};
+  --color-accent-active: #{$ball-yellow-500};
+  --color-accent-soft: rgba(223, 255, 0, 0.16);
+  --color-accent-contrast: #{$gray-950};
+
+  /* Fondos */
+
+  --color-background: #{$gray-50};
+  --color-background-secondary: #{$gray-100};
+  --color-background-tertiary: #{$gray-200};
+
+  --color-surface: #{$gray-0};
+  --color-surface-hover: #{$gray-50};
+  --color-surface-active: #{$gray-100};
+  --color-surface-elevated: #{$gray-0};
+
+  /* Texto */
+
+  --color-text: #{$gray-900};
+  --color-text-secondary: #{$gray-600};
+  --color-text-muted: #{$gray-500};
+  --color-text-disabled: #{$gray-400};
+  --color-text-inverse: #{$gray-0};
+
+  /* Bordes */
+
+  --color-border: #{$gray-200};
+  --color-border-strong: #{$gray-300};
+  --color-divider: rgba(15, 23, 42, 0.1);
+
+  /* Estados */
+
+  --color-success: #{$padel-green-600};
+  --color-success-background: #{$padel-green-50};
+  --color-success-border: #{$padel-green-200};
+
+  --color-error: #{$red-600};
+  --color-error-background: #{$red-50};
+  --color-error-border: #{$red-200};
+
+  --color-warning: #{$orange-600};
+  --color-warning-background: #{$orange-50};
+  --color-warning-border: #{$orange-200};
+
+  --color-info: #{$blue-600};
+  --color-info-background: #{$blue-50};
+  --color-info-border: #{$blue-200};
+
+  /* Inputs */
+
+  --color-input-background: #{$gray-0};
+  --color-input-border: #{$gray-300};
+  --color-input-border-hover: #{$gray-400};
+  --color-input-placeholder: #{$gray-400};
+  --color-input-disabled: #{$gray-100};
+
+  /* Elementos específicos */
+
+  --color-header-background: rgba(255, 255, 255, 0.88);
+  --color-sidebar-background: #{$gray-0};
+  --color-card-background: #{$gray-0};
+  --color-modal-background: #{$gray-0};
+  --color-overlay: rgba(2, 6, 23, 0.55);
+  --color-tooltip-background: #{$gray-900};
+
+  /* Cancha de pádel */
+
+  --color-court: #{$padel-green-600};
+  --color-court-dark: #{$padel-green-800};
+  --color-court-line: rgba(255, 255, 255, 0.9);
+  --color-court-glass: rgba(171, 237, 225, 0.28);
+  --color-padel-ball: #{$ball-yellow-300};
+
+  /* Focus */
+
+  --color-focus: #{$padel-green-500};
+  --focus-ring: 0 0 0 3px rgba(22, 183, 125, 0.24);
+
+  /* Sombras */
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-sm:
+    0 1px 3px rgba(15, 23, 42, 0.08),
+    0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md:
+    0 6px 16px rgba(15, 23, 42, 0.08),
+    0 2px 6px rgba(15, 23, 42, 0.05);
+  --shadow-lg:
+    0 16px 32px rgba(15, 23, 42, 0.12),
+    0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-xl: 0 24px 50px rgba(15, 23, 42, 0.16);
+}
+
+/* =========================================================
+   11. TEMA OSCURO MANUAL
+   Se activa con: <html data-theme="dark">
+   ========================================================= */
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Marca */
+
+  --color-primary: #{$padel-green-400};
+  --color-primary-hover: #{$padel-green-300};
+  --color-primary-active: #{$padel-green-200};
+  --color-primary-light: #{$padel-green-900};
+  --color-primary-soft: rgba(59, 212, 154, 0.13);
+  --color-primary-contrast: #{$gray-950};
+
+  --color-accent: #{$ball-yellow-300};
+  --color-accent-hover: #{$ball-yellow-200};
+  --color-accent-active: #{$ball-yellow-100};
+  --color-accent-soft: rgba(223, 255, 0, 0.12);
+  --color-accent-contrast: #{$gray-950};
+
+  /* Fondos */
+
+  --color-background: #071713;
+  --color-background-secondary: #0b211b;
+  --color-background-tertiary: #102c24;
+
+  --color-surface: #0d251f;
+  --color-surface-hover: #123229;
+  --color-surface-active: #173d32;
+  --color-surface-elevated: #123129;
+
+  /* Texto */
+
+  --color-text: #{$gray-50};
+  --color-text-secondary: #{$gray-300};
+  --color-text-muted: #{$gray-400};
+  --color-text-disabled: #{$gray-600};
+  --color-text-inverse: #{$gray-950};
+
+  /* Bordes */
+
+  --color-border: rgba(226, 232, 240, 0.12);
+  --color-border-strong: rgba(226, 232, 240, 0.22);
+  --color-divider: rgba(226, 232, 240, 0.1);
+
+  /* Estados */
+
+  --color-success: #{$padel-green-300};
+  --color-success-background: rgba(8, 118, 83, 0.2);
+  --color-success-border: rgba(124, 233, 187, 0.3);
+
+  --color-error: #{$red-300};
+  --color-error-background: rgba(190, 18, 60, 0.18);
+  --color-error-border: rgba(253, 164, 175, 0.28);
+
+  --color-warning: #{$orange-300};
+  --color-warning-background: rgba(194, 65, 12, 0.18);
+  --color-warning-border: rgba(253, 186, 116, 0.28);
+
+  --color-info: #{$blue-300};
+  --color-info-background: rgba(29, 101, 214, 0.18);
+  --color-info-border: rgba(147, 209, 253, 0.28);
+
+  /* Inputs */
+
+  --color-input-background: #0a201a;
+  --color-input-border: rgba(226, 232, 240, 0.2);
+  --color-input-border-hover: rgba(226, 232, 240, 0.35);
+  --color-input-placeholder: #{$gray-500};
+  --color-input-disabled: #071713;
+
+  /* Elementos específicos */
+
+  --color-header-background: rgba(7, 23, 19, 0.88);
+  --color-sidebar-background: #0a201a;
+  --color-card-background: #0d251f;
+  --color-modal-background: #102c24;
+  --color-overlay: rgba(0, 0, 0, 0.72);
+  --color-tooltip-background: #{$gray-100};
+
+  /* Cancha de pádel */
+
+  --color-court: #{$padel-green-700};
+  --color-court-dark: #{$padel-green-950};
+  --color-court-line: rgba(255, 255, 255, 0.78);
+  --color-court-glass: rgba(171, 237, 225, 0.16);
+  --color-padel-ball: #{$ball-yellow-300};
+
+  /* Focus */
+
+  --color-focus: #{$padel-green-300};
+  --focus-ring: 0 0 0 3px rgba(124, 233, 187, 0.28);
+
+  /* Sombras */
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm:
+    0 2px 5px rgba(0, 0, 0, 0.24),
+    0 1px 2px rgba(0, 0, 0, 0.18);
+  --shadow-md:
+    0 8px 20px rgba(0, 0, 0, 0.28),
+    0 2px 6px rgba(0, 0, 0, 0.2);
+  --shadow-lg:
+    0 18px 38px rgba(0, 0, 0, 0.34),
+    0 4px 12px rgba(0, 0, 0, 0.24);
+  --shadow-xl: 0 28px 60px rgba(0, 0, 0, 0.42);
+}
+
+/* =========================================================
+   12. MODO AUTOMÁTICO
+   Solo se aplica si no existe data-theme en <html>.
+   ========================================================= */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --color-primary: #{$padel-green-400};
+    --color-primary-hover: #{$padel-green-300};
+    --color-primary-active: #{$padel-green-200};
+    --color-primary-light: #{$padel-green-900};
+    --color-primary-soft: rgba(59, 212, 154, 0.13);
+    --color-primary-contrast: #{$gray-950};
+
+    --color-accent: #{$ball-yellow-300};
+    --color-accent-hover: #{$ball-yellow-200};
+    --color-accent-active: #{$ball-yellow-100};
+    --color-accent-soft: rgba(223, 255, 0, 0.12);
+    --color-accent-contrast: #{$gray-950};
+
+    --color-background: #071713;
+    --color-background-secondary: #0b211b;
+    --color-background-tertiary: #102c24;
+
+    --color-surface: #0d251f;
+    --color-surface-hover: #123229;
+    --color-surface-active: #173d32;
+    --color-surface-elevated: #123129;
+
+    --color-text: #{$gray-50};
+    --color-text-secondary: #{$gray-300};
+    --color-text-muted: #{$gray-400};
+    --color-text-disabled: #{$gray-600};
+    --color-text-inverse: #{$gray-950};
+
+    --color-border: rgba(226, 232, 240, 0.12);
+    --color-border-strong: rgba(226, 232, 240, 0.22);
+    --color-divider: rgba(226, 232, 240, 0.1);
+
+    --color-success: #{$padel-green-300};
+    --color-success-background: rgba(8, 118, 83, 0.2);
+    --color-success-border: rgba(124, 233, 187, 0.3);
+
+    --color-error: #{$red-300};
+    --color-error-background: rgba(190, 18, 60, 0.18);
+    --color-error-border: rgba(253, 164, 175, 0.28);
+
+    --color-warning: #{$orange-300};
+    --color-warning-background: rgba(194, 65, 12, 0.18);
+    --color-warning-border: rgba(253, 186, 116, 0.28);
+
+    --color-info: #{$blue-300};
+    --color-info-background: rgba(29, 101, 214, 0.18);
+    --color-info-border: rgba(147, 209, 253, 0.28);
+
+    --color-input-background: #0a201a;
+    --color-input-border: rgba(226, 232, 240, 0.2);
+    --color-input-border-hover: rgba(226, 232, 240, 0.35);
+    --color-input-placeholder: #{$gray-500};
+    --color-input-disabled: #071713;
+
+    --color-header-background: rgba(7, 23, 19, 0.88);
+    --color-sidebar-background: #0a201a;
+    --color-card-background: #0d251f;
+    --color-modal-background: #102c24;
+    --color-overlay: rgba(0, 0, 0, 0.72);
+    --color-tooltip-background: #{$gray-100};
+
+    --color-court: #{$padel-green-700};
+    --color-court-dark: #{$padel-green-950};
+    --color-court-line: rgba(255, 255, 255, 0.78);
+    --color-court-glass: rgba(171, 237, 225, 0.16);
+    --color-padel-ball: #{$ball-yellow-300};
+
+    --color-focus: #{$padel-green-300};
+    --focus-ring: 0 0 0 3px rgba(124, 233, 187, 0.28);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-sm:
+      0 2px 5px rgba(0, 0, 0, 0.24),
+      0 1px 2px rgba(0, 0, 0, 0.18);
+    --shadow-md:
+      0 8px 20px rgba(0, 0, 0, 0.28),
+      0 2px 6px rgba(0, 0, 0, 0.2);
+    --shadow-lg:
+      0 18px 38px rgba(0, 0, 0, 0.34),
+      0 4px 12px rgba(0, 0, 0, 0.24);
+    --shadow-xl: 0 28px 60px rgba(0, 0, 0, 0.42);
+  }
+}
+
+/* =========================================================
+   13. Mixins responsive
+   ========================================================= */
+
+@mixin screen-min($breakpoint) {
+  @media (min-width: $breakpoint) {
+    @content;
+  }
+}
+
+@mixin screen-max($breakpoint) {
+  @media (max-width: calc($breakpoint - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: calc($breakpoint-md - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md ) and (max-width: calc($breakpoint-lg - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+/* =========================================================
+   14. Mixins reutilizables
+   ========================================================= */
+
+@mixin focus-ring {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@mixin interactive-focus {
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@mixin disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin line-clamp($lines: 2) {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+}
+
+@mixin visually-hidden {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+
+  border: 0;
+
+  white-space: nowrap;
+}
+
+@mixin card {
+  border: $border-width solid var(--color-border);
+  border-radius: $radius-xl;
+
+  background: var(--color-card-background);
+  box-shadow: var(--shadow-sm);
+}
+
+@mixin container {
+  width: min(calc(100% - (#{$page-padding-mobile} * 2)),
+    #{$container-xl});
+
+  margin-inline: auto;
+
+  @include screen-min($breakpoint-md) {
+    width: min(calc(100% - (#{$page-padding-tablet} * 2)),
+      #{$container-xl});
+  }
+
+  @include screen-min($breakpoint-lg) {
+    width: min(calc(100% - (#{$page-padding-desktop} * 2)),
+      #{$container-xl});
+  }
+}
+
+/* =========================================================
+   15. Estilos globales mínimos
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+
+  font-family: $font-family-primary;
+  font-size: 16px;
+
+  background: var(--color-background);
+
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+
+  color: var(--color-text);
+  background: var(--color-background);
+
+  font-family: $font-family-primary;
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+
+  transition:
+    color $duration-normal $ease-out,
+    background-color $duration-normal $ease-out;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea,
+select {
+  color: inherit;
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a[href] {
+  cursor: pointer;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+::selection {
+  color: var(--color-accent-contrast);
+  background: var(--color-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

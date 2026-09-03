@@ -1,0 +1,489 @@
+@use "../../scss/base" as *;
+
+.card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  overflow: hidden;
+
+  border: $border-width solid var(--color-border);
+  border-radius: $radius-xl;
+
+  color: var(--color-text);
+  background: var(--color-card-background);
+
+  box-shadow: var(--shadow-sm);
+
+  transition: $transition-default;
+}
+
+/* =========================================================
+   Variantes
+   ========================================================= */
+
+.default {
+  border-color: var(--color-border);
+}
+
+.primary {
+  border-color: var(--color-success-border);
+
+  background:
+    linear-gradient(145deg,
+      var(--color-primary-soft),
+      transparent 55%),
+    var(--color-card-background);
+}
+
+.accent {
+  border-color: color-mix(in srgb,
+      var(--color-accent) 45%,
+      var(--color-border));
+
+  background:
+    linear-gradient(145deg,
+      var(--color-accent-soft),
+      transparent 55%),
+    var(--color-card-background);
+}
+
+/* =========================================================
+   Espaciado
+   ========================================================= */
+
+.padding-sm {
+  .body {
+    padding: $spacing-4;
+  }
+}
+
+.padding-md {
+  .body {
+    padding: $spacing-6;
+  }
+}
+
+.padding-lg {
+  .body {
+    padding: $spacing-8;
+  }
+}
+
+/* =========================================================
+   Tarjeta interactiva
+   ========================================================= */
+
+.interactive {
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    border-color: var(--color-primary);
+
+    background-color: var(--color-surface-hover);
+    box-shadow: var(--shadow-md);
+
+    transform: translateY(-4px);
+
+    .image {
+      transform: scale(1.04);
+    }
+
+    .title {
+      color: var(--color-primary);
+    }
+  }
+
+  &:active {
+    box-shadow: var(--shadow-sm);
+
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      var(--focus-ring),
+      var(--shadow-md);
+  }
+}
+
+/* =========================================================
+   Imagen
+   ========================================================= */
+
+.imageContainer {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  overflow: hidden;
+
+  background: var(--color-background-secondary);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform $duration-slow $ease-out;
+}
+
+.imageBadge {
+  position: absolute;
+  top: $spacing-3;
+  right: $spacing-3;
+
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 28px;
+  padding: $spacing-1 $spacing-3;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-full;
+
+  color: $gray-950;
+  background: var(--color-accent);
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $letter-spacing-wide;
+  text-transform: uppercase;
+
+  box-shadow: var(--shadow-sm);
+}
+
+/* =========================================================
+   Contenido
+   ========================================================= */
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-3;
+
+  margin-bottom: $spacing-4;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  border-radius: $radius-lg;
+
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+
+  svg {
+    width: 23px;
+    height: 23px;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 26px;
+  padding: $spacing-1 $spacing-3;
+
+  border: 1px solid var(--color-success-border);
+  border-radius: $radius-full;
+
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $letter-spacing-wide;
+  text-transform: uppercase;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+
+  margin-bottom: $spacing-3;
+}
+
+.title {
+  margin: 0;
+
+  color: var(--color-text);
+
+  font-family: $font-family-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  letter-spacing: $letter-spacing-tight;
+
+  transition: color $duration-normal $ease-out;
+}
+
+.subtitle {
+  margin: 0;
+
+  color: var(--color-primary);
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.description {
+  margin: 0 0 $spacing-4;
+
+  color: var(--color-text-secondary);
+
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+}
+
+.content {
+  flex: 1;
+
+  min-width: 0;
+
+  color: var(--color-text-secondary);
+
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+
+  &:empty {
+    display: none;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* =========================================================
+   Acciones y footer
+   ========================================================= */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-2;
+
+  margin-top: $spacing-6;
+
+  button,
+  a {
+    min-height: $touch-target-min;
+  }
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-3;
+
+  margin-top: $spacing-5;
+  padding-top: $spacing-4;
+
+  border-top: $border-width solid var(--color-divider);
+
+  color: var(--color-text-muted);
+
+  font-size: $font-size-sm;
+}
+
+/* =========================================================
+   Variante horizontal
+   ========================================================= */
+
+.horizontal {
+  flex-direction: row;
+
+  .imageContainer {
+    flex: 0 0 38%;
+
+    width: auto;
+    min-height: 100%;
+
+    aspect-ratio: auto;
+  }
+
+  .body {
+    flex: 1;
+  }
+}
+
+/* =========================================================
+   Grilla responsive
+   ========================================================= */
+
+.grid {
+  --card-min-width: 280px;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit,
+      minmax(min(100%, var(--card-min-width)), 1fr));
+  gap: $spacing-6;
+
+  width: 100%;
+}
+
+/* =========================================================
+   Skeleton
+   ========================================================= */
+
+.loading {
+  pointer-events: none;
+}
+
+.skeletonImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  background: linear-gradient(90deg,
+      var(--color-background-secondary) 25%,
+      var(--color-background-tertiary) 50%,
+      var(--color-background-secondary) 75%);
+
+  background-size: 200% 100%;
+
+  animation: skeleton-loading 1.4s ease-in-out infinite;
+}
+
+.skeletonContent {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+
+  width: 100%;
+  padding: $spacing-6;
+}
+
+.skeletonLine {
+  display: block;
+
+  width: 100%;
+  height: 12px;
+
+  border-radius: $radius-full;
+
+  background: linear-gradient(90deg,
+      var(--color-background-secondary) 25%,
+      var(--color-background-tertiary) 50%,
+      var(--color-background-secondary) 75%);
+
+  background-size: 200% 100%;
+
+  animation: skeleton-loading 1.4s ease-in-out infinite;
+}
+
+.skeletonTitle {
+  width: 62%;
+  height: 22px;
+
+  margin-bottom: $spacing-2;
+}
+
+.skeletonShort {
+  width: 45%;
+}
+
+@keyframes skeleton-loading {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@include mobile {
+  .grid {
+    gap: $spacing-4;
+  }
+
+  .padding-lg {
+    .body {
+      padding: $spacing-5;
+    }
+  }
+
+  .horizontal {
+    flex-direction: column;
+
+    .imageContainer {
+      flex: none;
+
+      width: 100%;
+      min-height: auto;
+
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  .actions {
+    >* {
+      flex: 1;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-xs) {
+
+  .padding-md,
+  .padding-lg {
+    .body {
+      padding: $spacing-4;
+    }
+  }
+
+  .title {
+    font-size: $font-size-lg;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+  .image {
+    transition: none;
+  }
+
+  .skeletonImage,
+  .skeletonLine {
+    animation: none;
+  }
+}

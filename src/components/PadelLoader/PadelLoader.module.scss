@@ -1,0 +1,262 @@
+$court-green: #087f5b;
+$court-dark: #065f46;
+$line-color: rgba(255, 255, 255, 0.9);
+$ball-color: #dfff00;
+
+.loader {
+  --court-width: 180px;
+  --court-height: 104px;
+  --ball-size: 18px;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  color: #e8fff8;
+  font-family: inherit;
+}
+
+.sm {
+  --court-width: 130px;
+  --court-height: 76px;
+  --ball-size: 14px;
+}
+
+.md {
+  --court-width: 180px;
+  --court-height: 104px;
+  --ball-size: 18px;
+}
+
+.lg {
+  --court-width: 240px;
+  --court-height: 140px;
+  --ball-size: 22px;
+}
+
+.fullScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  background: radial-gradient(circle at 50% 42%,
+      #153e34,
+      #071a16 72%);
+}
+
+.court {
+  position: relative;
+
+  width: var(--court-width);
+  height: var(--court-height);
+
+  overflow: hidden;
+
+  border: 3px solid $line-color;
+  border-radius: 7px;
+
+  background:
+    linear-gradient(90deg,
+      transparent 49.4%,
+      $line-color 49.4% 50.6%,
+      transparent 50.6%),
+    linear-gradient(0deg,
+      transparent 49%,
+      $line-color 49% 51%,
+      transparent 51%),
+    linear-gradient(135deg, $court-green, $court-dark);
+
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.28),
+    inset 0 0 24px rgba(0, 0, 0, 0.16);
+
+  transform: perspective(430px) rotateX(56deg) rotateZ(-1deg);
+  transform-origin: center bottom;
+
+  &::before,
+  &::after {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+
+    width: 1px;
+
+    background: rgba(255, 255, 255, 0.42);
+  }
+
+  &::before {
+    left: 25%;
+  }
+
+  &::after {
+    right: 25%;
+  }
+}
+
+.net {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 0;
+
+  width: 100%;
+  height: 5px;
+
+  transform: translateY(-50%);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+
+  background: repeating-linear-gradient(90deg,
+      rgba(11, 25, 22, 0.9) 0 3px,
+      transparent 3px 7px);
+
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.32);
+}
+
+.ball,
+.shadow {
+  position: absolute;
+  left: 8%;
+
+  border-radius: 50%;
+}
+
+.ball {
+  z-index: 3;
+  top: 13%;
+
+  width: var(--ball-size);
+  aspect-ratio: 1;
+
+  background:
+    radial-gradient(circle at 32% 28%,
+      #f6ff9f 0 12%,
+      transparent 13%),
+    $ball-color;
+
+  box-shadow: inset -3px -4px 5px rgba(83, 107, 0, 0.28);
+
+  animation: ball-rally 1.25s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+
+  &::after {
+    content: "";
+
+    position: absolute;
+    inset: 2px;
+
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-color: transparent rgba(255, 255, 255, 0.75);
+    border-radius: 50%;
+
+    transform: rotate(28deg);
+  }
+}
+
+.shadow {
+  top: 37%;
+
+  width: calc(var(--ball-size) * 1.15);
+  height: calc(var(--ball-size) * 0.3);
+
+  background: rgba(0, 0, 0, 0.27);
+  filter: blur(2px);
+
+  animation: shadow-rally 1.25s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 650;
+  letter-spacing: 0.035em;
+
+  animation: label-pulse 1.25s ease-in-out infinite;
+}
+
+@keyframes ball-rally {
+  0% {
+    left: 8%;
+    top: 19%;
+    transform: scale(0.88) rotate(0deg);
+  }
+
+  24% {
+    top: 4%;
+  }
+
+  50% {
+    left: 82%;
+    top: 18%;
+    transform: scale(1.08) rotate(180deg);
+  }
+
+  74% {
+    top: 5%;
+  }
+
+  100% {
+    left: 8%;
+    top: 19%;
+    transform: scale(0.88) rotate(360deg);
+  }
+}
+
+@keyframes shadow-rally {
+
+  0%,
+  100% {
+    left: 8%;
+    opacity: 0.8;
+    transform: scale(1);
+  }
+
+  24% {
+    opacity: 0.24;
+    transform: scale(0.58);
+  }
+
+  50% {
+    left: 82%;
+    opacity: 0.8;
+    transform: scale(1);
+  }
+
+  74% {
+    opacity: 0.24;
+    transform: scale(0.58);
+  }
+}
+
+@keyframes label-pulse {
+
+  0%,
+  100% {
+    opacity: 0.58;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .ball,
+  .shadow,
+  .label {
+    animation: none;
+  }
+
+  .ball,
+  .shadow {
+    left: calc(50% - var(--ball-size) / 2);
+  }
+}

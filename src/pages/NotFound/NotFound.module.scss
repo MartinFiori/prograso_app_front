@@ -1,0 +1,382 @@
+$background-dark: #061b16;
+$background-light: #0b4738;
+$court-green: #087f5b;
+$court-dark: #05664a;
+$ball-color: #dfff00;
+$white: #ffffff;
+
+.page {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 32px 20px;
+
+  overflow: hidden;
+
+  color: $white;
+
+  background:
+    radial-gradient(circle at 50% 30%,
+      rgba(22, 148, 111, 0.28),
+      transparent 38%),
+    linear-gradient(145deg, $background-light, $background-dark 72%);
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 42px;
+
+  width: min(100%, 720px);
+
+  text-align: center;
+}
+
+.court {
+  position: relative;
+
+  width: min(82vw, 430px);
+  aspect-ratio: 1.65 / 1;
+
+  overflow: visible;
+
+  border: 4px solid rgba($white, 0.92);
+  border-radius: 8px;
+
+  background:
+    linear-gradient(90deg,
+      transparent 49.5%,
+      rgba($white, 0.85) 49.5% 50.5%,
+      transparent 50.5%),
+    linear-gradient(135deg, $court-green, $court-dark);
+
+  box-shadow:
+    0 30px 50px rgba(0, 0, 0, 0.32),
+    inset 0 0 40px rgba(0, 0, 0, 0.15);
+
+  transform: perspective(650px) rotateX(56deg);
+  transform-origin: center bottom;
+
+  &::before,
+  &::after {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+
+    width: 2px;
+
+    background: rgba($white, 0.7);
+  }
+
+  &::before {
+    left: 25%;
+  }
+
+  &::after {
+    right: 25%;
+  }
+}
+
+.glassWall {
+  position: absolute;
+  z-index: -1;
+  bottom: 100%;
+  left: -4px;
+
+  width: calc(100% + 8px);
+  height: 75px;
+
+  border: 3px solid rgba(200, 247, 238, 0.35);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+
+  background:
+    linear-gradient(90deg,
+      transparent 33%,
+      rgba(200, 247, 238, 0.25) 33% 33.5%,
+      transparent 33.5% 66%,
+      rgba(200, 247, 238, 0.25) 66% 66.5%,
+      transparent 66.5%),
+    rgba(151, 225, 213, 0.06);
+
+  backdrop-filter: blur(2px);
+}
+
+.serviceLine {
+  position: absolute;
+  top: 50%;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+
+  background: rgba($white, 0.85);
+}
+
+.centerLine {
+  position: absolute;
+  top: 0;
+  left: 50%;
+
+  width: 2px;
+  height: 100%;
+
+  background: rgba($white, 0.85);
+
+  transform: translateX(-50%);
+}
+
+.net {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: -2%;
+
+  width: 104%;
+  height: 9px;
+
+  border-top: 2px solid rgba($white, 0.85);
+  border-bottom: 1px solid rgba($white, 0.5);
+
+  background: repeating-linear-gradient(90deg,
+      rgba(2, 21, 16, 0.95) 0 4px,
+      transparent 4px 9px);
+
+  box-shadow: 0 5px 7px rgba(0, 0, 0, 0.3);
+
+  transform: translateY(-50%);
+}
+
+.ball,
+.ballShadow {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.ball {
+  z-index: 5;
+  top: -35%;
+  right: -8%;
+
+  width: clamp(34px, 9vw, 52px);
+  aspect-ratio: 1;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(circle at 30% 25%,
+      #f8ffb3 0 10%,
+      transparent 11%),
+    $ball-color;
+
+  box-shadow:
+    inset -6px -8px 10px rgba(62, 86, 0, 0.35),
+    0 10px 14px rgba(0, 0, 0, 0.3);
+
+  animation: floating-ball 2.4s ease-in-out infinite;
+}
+
+.ballLine {
+  position: absolute;
+  inset: 5px;
+
+  border: 2px solid rgba($white, 0.8);
+  border-color: transparent rgba($white, 0.8);
+  border-radius: 50%;
+
+  transform: rotate(28deg);
+}
+
+.ballShadow {
+  top: 5%;
+  right: -4%;
+
+  width: 52px;
+  height: 12px;
+
+  background: rgba(0, 0, 0, 0.3);
+  filter: blur(5px);
+
+  animation: floating-shadow 2.4s ease-in-out infinite;
+}
+
+.information {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.errorCode {
+  display: inline-flex;
+
+  margin-bottom: 12px;
+  padding: 7px 14px;
+
+  border: 1px solid rgba($ball-color, 0.5);
+  border-radius: 999px;
+
+  color: $ball-color;
+  background: rgba($ball-color, 0.08);
+
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.information h1 {
+  margin: 0;
+
+  font-size: clamp(2rem, 7vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.information p {
+  max-width: 530px;
+  margin: 20px 0 28px;
+
+  color: rgba($white, 0.72);
+
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
+  line-height: 1.6;
+}
+
+.homeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 48px;
+  padding: 0 22px;
+
+  border: 2px solid $ball-color;
+  border-radius: 12px;
+
+  color: #142000;
+  background: $ball-color;
+
+  font-weight: 750;
+  text-decoration: none;
+
+  box-shadow: 0 10px 24px rgba($ball-color, 0.18);
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+
+  &:hover {
+    background: #ecff56;
+
+    box-shadow: 0 14px 32px rgba($ball-color, 0.3);
+
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba($white, 0.9);
+    outline-offset: 4px;
+  }
+}
+
+.backgroundBall {
+  position: absolute;
+  right: -130px;
+  bottom: -180px;
+
+  width: 420px;
+  aspect-ratio: 1;
+
+  border: 16px solid rgba($ball-color, 0.035);
+  border-radius: 50%;
+
+  &::before {
+    content: "";
+
+    position: absolute;
+    inset: 45px;
+
+    border: 8px solid rgba($ball-color, 0.025);
+    border-color: transparent rgba($ball-color, 0.04);
+    border-radius: 50%;
+
+    transform: rotate(35deg);
+  }
+}
+
+@keyframes floating-ball {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-18px) rotate(130deg);
+  }
+}
+
+@keyframes floating-shadow {
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.2;
+    transform: scale(0.7);
+  }
+}
+
+@media (max-width: 520px) {
+  .content {
+    gap: 32px;
+  }
+
+  .court {
+    width: min(85vw, 340px);
+  }
+
+  .glassWall {
+    height: 52px;
+  }
+
+  .ball {
+    top: -32%;
+    right: 1%;
+  }
+
+  .ballShadow {
+    right: 4%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .ball,
+  .ballShadow {
+    animation: none;
+  }
+
+  .homeButton {
+    transition: none;
+  }
+}

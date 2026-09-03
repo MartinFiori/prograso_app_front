@@ -1,10 +1,8 @@
-import { Route, Routes } from "react-router-dom";
-
-// type Exercise = {
-//   id: number;
-//   created_at: string;
-//   title: string;
-// };
+import { Link, Route, Routes } from "react-router-dom";
+import PublicLayout from "../layouts/PublicLayout";
+import { lazy } from "react";
+// import Home from "../pages/Home/Home";
+const Home = lazy(() => import("../pages/Home/Home"));
 
 export default function RoutesPage() {
   // const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -30,8 +28,13 @@ export default function RoutesPage() {
     <Routes>
       <Route
         path="/"
-        element={<h1>hola</h1>}
-      />
+        element={<PublicLayout />}
+      >
+        <Route
+          path="/"
+          element={<Home />}
+        />
+      </Route>
     </Routes>
     // </Suspense>
   );
