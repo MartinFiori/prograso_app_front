@@ -68,6 +68,8 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     }
   }, []);
 
+  console.log(user);
+
   const logout = useCallback(async () => {
     setLoading(true);
 

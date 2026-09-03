@@ -29,15 +29,11 @@ export default function NotFound() {
         </div>
 
         <div className={styles.information}>
-          <span className={styles.errorCode}>Error 404</span>
-
           <h1>Pelota fuera de juego</h1>
-
           <p>
             La página que estás buscando no existe o fue movida a otra parte de
             la cancha.
           </p>
-
           <Link
             className={styles.homeButton}
             to="/"

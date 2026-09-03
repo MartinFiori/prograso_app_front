@@ -1,11 +1,11 @@
-$background-dark: #061b16;
-$background-light: #0b4738;
-$court-green: #087f5b;
-$court-dark: #05664a;
-$ball-color: #dfff00;
-$white: #ffffff;
-
 .page {
+  --notfound-background-dark: #061b16;
+  --notfound-background-light: #0b4738;
+  --notfound-court-green: #087f5b;
+  --notfound-court-dark: #05664a;
+  --notfound-ball-color: #dfff00;
+  --notfound-white: #ffffff;
+
   position: relative;
 
   display: grid;
@@ -17,13 +17,13 @@ $white: #ffffff;
 
   overflow: hidden;
 
-  color: $white;
+  color: var(--notfound-white);
 
   background:
     radial-gradient(circle at 50% 30%,
       rgba(22, 148, 111, 0.28),
       transparent 38%),
-    linear-gradient(145deg, $background-light, $background-dark 72%);
+    linear-gradient(145deg, var(--notfound-background-light), var(--notfound-background-dark) 72%);
 }
 
 .content {
@@ -48,15 +48,15 @@ $white: #ffffff;
 
   overflow: visible;
 
-  border: 4px solid rgba($white, 0.92);
+  border: 4px solid rgba(255, 255, 255, 0.92);
   border-radius: 8px;
 
   background:
     linear-gradient(90deg,
       transparent 49.5%,
-      rgba($white, 0.85) 49.5% 50.5%,
+      rgba(255, 255, 255, 0.85) 49.5% 50.5%,
       transparent 50.5%),
-    linear-gradient(135deg, $court-green, $court-dark);
+    linear-gradient(135deg, var(--notfound-court-green), var(--notfound-court-dark));
 
   box-shadow:
     0 30px 50px rgba(0, 0, 0, 0.32),
@@ -75,7 +75,7 @@ $white: #ffffff;
 
     width: 2px;
 
-    background: rgba($white, 0.7);
+    background: rgba(255, 255, 255, 0.7);
   }
 
   &::before {
@@ -120,7 +120,7 @@ $white: #ffffff;
   width: 100%;
   height: 2px;
 
-  background: rgba($white, 0.85);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .centerLine {
@@ -131,7 +131,7 @@ $white: #ffffff;
   width: 2px;
   height: 100%;
 
-  background: rgba($white, 0.85);
+  background: rgba(255, 255, 255, 0.85);
 
   transform: translateX(-50%);
 }
@@ -145,8 +145,8 @@ $white: #ffffff;
   width: 104%;
   height: 9px;
 
-  border-top: 2px solid rgba($white, 0.85);
-  border-bottom: 1px solid rgba($white, 0.5);
+  border-top: 2px solid rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 
   background: repeating-linear-gradient(90deg,
       rgba(2, 21, 16, 0.95) 0 4px,
@@ -177,7 +177,7 @@ $white: #ffffff;
     radial-gradient(circle at 30% 25%,
       #f8ffb3 0 10%,
       transparent 11%),
-    $ball-color;
+    var(--notfound-ball-color);
 
   box-shadow:
     inset -6px -8px 10px rgba(62, 86, 0, 0.35),
@@ -190,8 +190,8 @@ $white: #ffffff;
   position: absolute;
   inset: 5px;
 
-  border: 2px solid rgba($white, 0.8);
-  border-color: transparent rgba($white, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-color: transparent rgba(255, 255, 255, 0.8);
   border-radius: 50%;
 
   transform: rotate(28deg);
@@ -216,24 +216,6 @@ $white: #ffffff;
   align-items: center;
 }
 
-.errorCode {
-  display: inline-flex;
-
-  margin-bottom: 12px;
-  padding: 7px 14px;
-
-  border: 1px solid rgba($ball-color, 0.5);
-  border-radius: 999px;
-
-  color: $ball-color;
-  background: rgba($ball-color, 0.08);
-
-  font-size: 0.78rem;
-  font-weight: 750;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
 .information h1 {
   margin: 0;
 
@@ -246,7 +228,7 @@ $white: #ffffff;
   max-width: 530px;
   margin: 20px 0 28px;
 
-  color: rgba($white, 0.72);
+  color: rgba(255, 255, 255, 0.72);
 
   font-size: clamp(1rem, 2.5vw, 1.1rem);
   line-height: 1.6;
@@ -261,16 +243,16 @@ $white: #ffffff;
   min-height: 48px;
   padding: 0 22px;
 
-  border: 2px solid $ball-color;
+  border: 2px solid var(--notfound-ball-color);
   border-radius: 12px;
 
   color: #142000;
-  background: $ball-color;
+  background: var(--notfound-ball-color);
 
   font-weight: 750;
   text-decoration: none;
 
-  box-shadow: 0 10px 24px rgba($ball-color, 0.18);
+  box-shadow: 0 10px 24px rgba(223, 255, 0, 0.18);
 
   transition:
     transform 180ms ease,
@@ -280,7 +262,7 @@ $white: #ffffff;
   &:hover {
     background: #ecff56;
 
-    box-shadow: 0 14px 32px rgba($ball-color, 0.3);
+    box-shadow: 0 14px 32px rgba(223, 255, 0, 0.3);
 
     transform: translateY(-2px);
   }
@@ -290,7 +272,7 @@ $white: #ffffff;
   }
 
   &:focus-visible {
-    outline: 3px solid rgba($white, 0.9);
+    outline: 3px solid rgba(255, 255, 255, 0.9);
     outline-offset: 4px;
   }
 }
@@ -303,7 +285,7 @@ $white: #ffffff;
   width: 420px;
   aspect-ratio: 1;
 
-  border: 16px solid rgba($ball-color, 0.035);
+  border: 16px solid rgba(223, 255, 0, 0.035);
   border-radius: 50%;
 
   &::before {
@@ -312,8 +294,8 @@ $white: #ffffff;
     position: absolute;
     inset: 45px;
 
-    border: 8px solid rgba($ball-color, 0.025);
-    border-color: transparent rgba($ball-color, 0.04);
+    border: 8px solid rgba(223, 255, 0, 0.025);
+    border-color: transparent rgba(223, 255, 0, 0.04);
     border-radius: 50%;
 
     transform: rotate(35deg);

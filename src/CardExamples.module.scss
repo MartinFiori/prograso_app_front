@@ -1,15 +1,15 @@
-@use "./scss/base" as *;
+@use "./scss/mixins" as *;
 
 .price {
   color: var(--color-primary);
 
-  font-size: $font-size-lg;
+  font-size: var(--font-size-lg);
 }
 
 .details {
   display: flex;
   flex-direction: column;
-  gap: $spacing-2;
+  gap: var(--spacing-2);
 
   margin: 0;
   padding: 0;
@@ -19,7 +19,7 @@
   li {
     display: flex;
     align-items: center;
-    gap: $spacing-2;
+    gap: var(--spacing-2);
 
     &::before {
       content: "✓";
@@ -30,13 +30,13 @@
       width: 20px;
       height: 20px;
 
-      border-radius: $radius-full;
+      border-radius: var(--radius-full);
 
       color: var(--color-primary);
       background: var(--color-primary-soft);
 
-      font-size: $font-size-xs;
-      font-weight: $font-weight-bold;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
     }
   }
 }
@@ -46,7 +46,7 @@
 .matchInformation {
   display: flex;
   flex-direction: column;
-  gap: $spacing-4;
+  gap: var(--spacing-4);
 
   p {
     margin: 0;
@@ -57,7 +57,7 @@
   display: flex;
   align-items: center;
 
-  padding-left: $spacing-2;
+  padding-left: var(--spacing-2);
 }
 
 .avatar {
@@ -66,16 +66,16 @@
 
   width: 42px;
   height: 42px;
-  margin-left: -$spacing-2;
+  margin-left: calc(var(--spacing-2) * -1);
 
   border: 3px solid var(--color-card-background);
-  border-radius: $radius-full;
+  border-radius: var(--radius-full);
 
   color: var(--color-primary-contrast);
   background: var(--color-primary);
 
-  font-size: $font-size-xs;
-  font-weight: $font-weight-bold;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
 }
 
 .emptyAvatar {
@@ -91,7 +91,7 @@
 .bookingDetails {
   display: flex;
   flex-direction: column;
-  gap: $spacing-3;
+  gap: var(--spacing-3);
 
   margin: 0;
 
@@ -99,13 +99,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: $spacing-4;
+    gap: var(--spacing-4);
   }
 
   dt {
     color: var(--color-text-muted);
 
-    font-size: $font-size-sm;
+    font-size: var(--font-size-sm);
   }
 
   dd {
@@ -113,8 +113,8 @@
 
     color: var(--color-text);
 
-    font-size: $font-size-sm;
-    font-weight: $font-weight-semibold;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     text-align: right;
   }
 }
@@ -122,8 +122,8 @@
 .code {
   color: var(--color-primary);
 
-  font-family: $font-family-monospace;
-  letter-spacing: $letter-spacing-wide;
+  font-family: var(--font-family-monospace);
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 /* Botones */
@@ -135,15 +135,15 @@
   align-items: center;
   justify-content: center;
 
-  min-height: $button-height-md;
-  padding: 0 $spacing-5;
+  min-height: var(--button-height-md);
+  padding: 0 var(--spacing-5);
 
-  border: $border-width solid transparent;
-  border-radius: $radius-lg;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-lg);
 
-  font-weight: $font-weight-semibold;
+  font-weight: var(--font-weight-semibold);
 
-  transition: $transition-default;
+  transition: var(--transition-default);
 
   &:focus-visible {
     @include focus-ring;
@@ -195,7 +195,7 @@
     div {
       align-items: flex-start;
       flex-direction: column;
-      gap: $spacing-1;
+      gap: var(--spacing-1);
     }
 
     dd {

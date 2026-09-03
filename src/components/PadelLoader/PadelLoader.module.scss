@@ -1,9 +1,8 @@
-$court-green: #087f5b;
-$court-dark: #065f46;
-$line-color: rgba(255, 255, 255, 0.9);
-$ball-color: #dfff00;
-
 .loader {
+  --court-green: #087f5b;
+  --court-dark: #065f46;
+  --line-color: rgba(255, 255, 255, 0.9);
+  --ball-color: #dfff00;
   --court-width: 180px;
   --court-height: 104px;
   --ball-size: 18px;
@@ -58,19 +57,19 @@ $ball-color: #dfff00;
 
   overflow: hidden;
 
-  border: 3px solid $line-color;
+  border: 3px solid var(--line-color);
   border-radius: 7px;
 
   background:
     linear-gradient(90deg,
       transparent 49.4%,
-      $line-color 49.4% 50.6%,
+      var(--line-color) 49.4% 50.6%,
       transparent 50.6%),
     linear-gradient(0deg,
       transparent 49%,
-      $line-color 49% 51%,
+      var(--line-color) 49% 51%,
       transparent 51%),
-    linear-gradient(135deg, $court-green, $court-dark);
+    linear-gradient(135deg, var(--court-green), var(--court-dark));
 
   box-shadow:
     0 14px 30px rgba(0, 0, 0, 0.28),
@@ -141,7 +140,7 @@ $ball-color: #dfff00;
     radial-gradient(circle at 32% 28%,
       #f6ff9f 0 12%,
       transparent 13%),
-    $ball-color;
+    var(--ball-color);
 
   box-shadow: inset -3px -4px 5px rgba(83, 107, 0, 0.28);
 
