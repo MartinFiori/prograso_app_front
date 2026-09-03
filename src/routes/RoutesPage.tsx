@@ -26,10 +26,10 @@ export default function RoutesPage() {
         />
         <Route />
       </Route>
-      {/* <Route
+      <Route
         path="/*"
         element={<NotFound />}
-      /> */}
+      />
     </Routes>
   );
 }
