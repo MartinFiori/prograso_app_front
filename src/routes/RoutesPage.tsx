@@ -1,7 +1,8 @@
-import { Link, Route, Routes } from "react-router-dom";
-import PublicLayout from "../layouts/PublicLayout";
 import { lazy } from "react";
+import { Route, Routes } from "react-router-dom";
+import PublicLayout from "../layouts/PublicLayout";
 // import Home from "../pages/Home/Home";
+const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
 const Home = lazy(() => import("../pages/Home/Home"));
 
 export default function RoutesPage() {
@@ -33,6 +34,10 @@ export default function RoutesPage() {
         <Route
           path="/"
           element={<Home />}
+        />
+        <Route
+          path="/*"
+          element={<NotFound />}
         />
       </Route>
     </Routes>
