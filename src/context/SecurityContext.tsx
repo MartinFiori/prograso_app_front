@@ -54,7 +54,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   }, []);
 
   const login = useCallback(async () => {
-    const redirectTo = `${process.env.PUBLIC_URL}/auth/callback`;
+    const redirectTo = `/auth/callback`;
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
