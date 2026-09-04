@@ -68,8 +68,6 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     }
   }, []);
 
-  console.log(user);
-
   const logout = useCallback(async () => {
     setLoading(true);
 
@@ -90,19 +88,24 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   }, []);
 
   useEffect(() => {
-    void loadSession();
-
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      setLoading(false);
+
+      if (
+        event === "INITIAL_SESSION" ||
+        event === "SIGNED_IN" ||
+        event === "SIGNED_OUT"
+      ) {
+        setLoading(false);
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [loadSession]);
+  }, []);
 
   const value = useMemo<SecurityContextType>(
     () => ({
