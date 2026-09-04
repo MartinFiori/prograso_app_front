@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
 const AuthCallback = lazy(() => import("../pages/AuthCallback/AuthCallback"));
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
