@@ -1,0 +1,138 @@
+@use "../../scss/mixins" as *;
+
+.page {
+  @include container;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding-block: var(--spacing-8);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  width: fit-content;
+
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+
+  @include interactive-focus;
+}
+
+.hero {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: var(--radius-xl);
+  border: var(--border-width) solid var(--color-border);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 4px solid var(--color-court);
+}
+
+.badge {
+  align-self: flex-start;
+  min-height: 28px;
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.primary {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.default {
+  background: var(--color-background-secondary);
+}
+
+.accent {
+  color: var(--color-accent-contrast);
+  background: var(--color-accent);
+}
+
+.category {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.meta {
+  display: grid;
+  gap: var(--spacing-4);
+  margin: 0;
+  padding: var(--spacing-5);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+
+  @include screen-min($breakpoint-md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  dt {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  dd {
+    margin: 0;
+    font-size: var(--font-size-md);
+  }
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-4);
+  color: var(--color-error);
+}
+
+.roster {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.rosterHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.rosterCount {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-4);
+}

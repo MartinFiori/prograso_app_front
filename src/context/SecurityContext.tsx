@@ -10,11 +10,21 @@ import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { User } from "@supabase/supabase-js";
 
 import { supabase } from "../utils/supabase";
+import {
+  isConnectionError,
+  useConnection,
+} from "../hooks/useConnection";
+import { getMePath } from "../services/eventsApi";
+import type { ApiResponse } from "../types";
+import type { MeProfile } from "../types/me";
 
 export type SecurityContextType = {
   user: User | null;
   loading: boolean;
+  profile: MeProfile | null;
+  profileLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   loadSession: () => Promise<void>;
@@ -30,6 +40,9 @@ export const SecurityContext = createContext<SecurityContextType | null>(null);
 export function SecurityProvider({ children }: SecurityProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<MeProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const connection = useConnection();
 
   const loadSession = useCallback(async () => {
     setLoading(true);
@@ -79,6 +92,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
       }
 
       setUser(null);
+      setProfile(null);
     } catch (error: unknown) {
       console.error("Error cerrando sesión:", error);
       throw error;
@@ -107,17 +121,53 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const userId = user?.id;
+
+    if (!userId) {
+      setProfile(null);
+      setProfileLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setProfileLoading(true);
+
+    void connection<ApiResponse<MeProfile>>({ url: getMePath() }).then(
+      (result) => {
+        if (cancelled) {
+          return;
+        }
+
+        if (isConnectionError(result)) {
+          setProfile(null);
+        } else {
+          setProfile(result.data);
+        }
+
+        setProfileLoading(false);
+      },
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, connection]);
+
   const value = useMemo<SecurityContextType>(
     () => ({
       user,
       loading,
+      profile,
+      profileLoading,
       isAuthenticated: Boolean(user),
+      isAdmin: profile?.role === "admin",
       login,
       logout,
       loadSession,
       setUser,
     }),
-    [user, loading, login, logout, loadSession],
+    [user, loading, profile, profileLoading, login, logout, loadSession],
   );
 
   return (

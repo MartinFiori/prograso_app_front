@@ -1,0 +1,13 @@
+@use "../../scss/mixins" as *;
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+
+  @include screen-min($breakpoint-md) {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+  }
+}

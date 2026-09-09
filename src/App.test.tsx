@@ -1,9 +1,17 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+import { SecurityProvider } from "./context/SecurityContext";
+import RoutesPage from "./routes/RoutesPage";
+
+test("keeps the auth callback route", async () => {
+  render(
+    <MemoryRouter initialEntries={["/auth/callback"]}>
+      <SecurityProvider>
+        <RoutesPage />
+      </SecurityProvider>
+    </MemoryRouter>,
+  );
+
+  expect(await screen.findByText("Iniciando sesión...")).toBeInTheDocument();
 });

@@ -14,3 +14,6 @@
 - Never expose Supabase secret or service-role credentials.
 - Before completing a change, run the relevant tests and `pnpm build`.
 - Explain the root cause when fixing a bug.
+- HTTP contracts live in `../docs/api/`. Repo map: `../docs/architecture.md`.
+- The Express package is `../backend/` (`cd backend && npm start`). SQL definitions are in `../schemas/`.
+- Call the HTTP API only; do not query PostgREST for business tables.

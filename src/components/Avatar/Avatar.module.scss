@@ -8,3 +8,13 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
   display: block;
 }
+
+.fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--padel-green-100);
+  color: var(--padel-green-800);
+  font-weight: 600;
+  text-transform: uppercase;
+}

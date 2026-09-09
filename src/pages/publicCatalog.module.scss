@@ -1,0 +1,75 @@
+@use "../scss/mixins" as *;
+
+.page {
+  @include container;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+  padding-block: var(--spacing-8);
+}
+
+.masthead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding-bottom: var(--spacing-5);
+  border-bottom: 4px solid var(--color-court);
+}
+
+.lede {
+  max-width: 36rem;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  width: fit-content;
+
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+
+  @include interactive-focus;
+}
+
+.grid {
+  display: grid;
+  gap: var(--spacing-6);
+  grid-template-columns: 1fr;
+
+  @include screen-min($breakpoint-md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.message,
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-4);
+}
+
+.error {
+  color: var(--color-error);
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-4);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}

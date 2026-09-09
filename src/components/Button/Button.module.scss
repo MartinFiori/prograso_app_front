@@ -47,7 +47,7 @@
 
 .sm {
   min-height: var(--button-height-sm);
-  padding: px var(--spacing-3);
+  padding: 0 var(--spacing-3);
 
   border-radius: var(--radius-md);
 
@@ -56,26 +56,26 @@
   .icon,
   .spinner {
     width: 16px;
-    height: px;
+    height: 16px;
   }
 }
 
 .md {
   min-height: var(--button-height-md);
-  padding: px var(--spacing-5);
+  padding: 0 var(--spacing-5);
 
   font-size: var(--font-size-md);
 
   .icon,
   .spinner {
     width: 19px;
-    height: px;
+    height: 19px;
   }
 }
 
 .lg {
   min-height: var(--button-height-lg);
-  padding: px var(--spacing-6);
+  padding: 0 var(--spacing-6);
 
   border-radius: var(--radius-xl);
 

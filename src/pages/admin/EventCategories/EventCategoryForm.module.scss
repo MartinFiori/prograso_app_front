@@ -1,0 +1,70 @@
+@use "../../../scss/mixins" as *;
+
+.page {
+  @include container;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding-block: var(--spacing-8);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+  max-width: 32rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  min-height: var(--input-height-md);
+  padding: var(--spacing-3) var(--spacing-4);
+  border: var(--border-width) solid var(--color-input-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  background: var(--color-input-background);
+  font: inherit;
+
+  @include interactive-focus;
+}
+
+.textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+}
+
+.preview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius-xl);
+  border: var(--border-width) solid var(--color-border);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+
+  button,
+  a {
+    min-height: var(--touch-target-min);
+  }
+}
+
+.error {
+  color: var(--color-error);
+}

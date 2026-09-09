@@ -1,0 +1,150 @@
+@use "../../scss/mixins" as *;
+
+.page {
+  @include container;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding-block: var(--spacing-8);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 3px solid var(--color-court);
+}
+
+.grid {
+  display: grid;
+  gap: var(--spacing-6);
+  grid-template-columns: 1fr;
+
+  @include tablet {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+
+  button,
+  a {
+    min-height: var(--touch-target-min);
+  }
+}
+
+.message,
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-4);
+}
+
+.error {
+  color: var(--color-error);
+}
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border: var(--border-width) solid var(--color-warning-border);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-background);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+  max-width: 32rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  min-height: var(--input-height-md);
+  padding: var(--spacing-3) var(--spacing-4);
+  border: var(--border-width) solid var(--color-input-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  background: var(--color-input-background);
+  font: inherit;
+
+  @include interactive-focus;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-input-border-hover);
+  }
+}
+
+.textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: var(--spacing-3) var(--spacing-4);
+    border-bottom: var(--border-width) solid var(--color-border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    background: var(--color-background-secondary);
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+  color: var(--color-text-secondary);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  align-items: flex-end;
+}

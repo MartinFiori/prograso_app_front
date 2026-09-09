@@ -6,9 +6,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Montserrat", sans-serif;
-  font-optical-sizing: auto;
-  font-style: normal;
 }
 
 /* =========================================================
@@ -95,8 +92,8 @@
      2. Tipografías
      --------------------------------------------------------- */
 
-  --font-family-primary: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-family-heading: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-family-primary: "Montserrat", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-family-heading: "Montserrat", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-family-monospace: "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
   --font-size-xs: 0.75rem; // 12px
@@ -573,6 +570,7 @@ html {
   min-width: 320px;
 
   font-family: var(--font-family-primary);
+  font-optical-sizing: auto;
   font-size: 16px;
 
   background: var(--color-background);
@@ -592,6 +590,7 @@ body {
   font-family: var(--font-family-primary);
   font-size: var(--font-size-md);
   line-height: var(--line-height-normal);
+  font-optical-sizing: auto;
 
   transition:
     color var(--duration-normal) var(--ease-out),
@@ -599,6 +598,29 @@ body {
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-family-heading);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-text);
+}
+
+h1 {
+  font-size: var(--font-size-3xl);
+}
+
+h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+h3 {
+  font-size: var(--font-size-lg);
 }
 
 button,
