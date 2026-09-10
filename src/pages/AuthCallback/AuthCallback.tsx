@@ -1,14 +1,25 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { supabase } from "../../utils/supabase";
 
 const AUTH_CALLBACK_TIMEOUT_MS = 5000;
+const API_URL = process.env.REACT_APP_API_URL || "/";
+
+function redirectToApi(search?: string): void {
+  const target = new URL(API_URL, window.location.origin);
+
+  if (search) {
+    new URLSearchParams(search).forEach((value, key) => {
+      target.searchParams.set(key, value);
+    });
+  }
+
+  window.location.replace(target.toString());
+}
 
 function getCallbackError(): string | null {
   const search = new URLSearchParams(window.location.search);
   const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-  console.log({search, hash})
 
   return (
     search.get("error_description") ||
@@ -19,14 +30,12 @@ function getCallbackError(): string | null {
 }
 
 export default function AuthCallback() {
-  const navigate = useNavigate();
-
   useEffect(() => {
     let cancelled = false;
 
     const goHome = () => {
       if (!cancelled) {
-        navigate("/", { replace: true });
+        redirectToApi();
       }
     };
 
@@ -36,7 +45,7 @@ export default function AuthCallback() {
       }
 
       if (!cancelled) {
-        navigate("/?authError=true", { replace: true });
+        redirectToApi("authError=true");
       }
     };
 
@@ -86,7 +95,7 @@ export default function AuthCallback() {
       window.clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   return <p>Iniciando sesión...</p>;
 }
