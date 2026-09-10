@@ -24,6 +24,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "prebuild": "node scripts/assert-prod-site-url.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

@@ -1,7 +1,11 @@
 type AppUrlEnv = {
   siteUrl?: string;
   nodeEnv?: string;
+  browserOrigin?: string;
 };
+
+const LOCALHOST_SITE_URL_ERROR =
+  "REACT_APP_SITE_URL no puede ser localhost en production";
 
 function isLocalhostOrigin(value: string): boolean {
   if (!value) {
@@ -25,13 +29,13 @@ export function getAppOrigin(env: AppUrlEnv = {}): string {
     (env.siteUrl ?? process.env.REACT_APP_SITE_URL ?? "").trim(),
   );
   const nodeEnv = env.nodeEnv ?? process.env.NODE_ENV;
-  const browserOrigin =
-    typeof window === "undefined"
-      ? ""
-      : stripTrailingSlash(window.location.origin);
+  const browserOrigin = stripTrailingSlash(
+    env.browserOrigin ??
+      (typeof window === "undefined" ? "" : window.location.origin),
+  );
 
   if (nodeEnv === "production" && isLocalhostOrigin(siteUrl)) {
-    return browserOrigin;
+    throw new Error(LOCALHOST_SITE_URL_ERROR);
   }
 
   return siteUrl || browserOrigin;

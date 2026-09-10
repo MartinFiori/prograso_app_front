@@ -6,7 +6,8 @@ import AdminRoute from "./guards/AdminRoute";
 
 const AuthCallback = lazy(() => import("../pages/AuthCallback/AuthCallback"));
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
-const Home = lazy(() => import("../pages/Home/Home"));
+const HomeIndex = lazy(() => import("../pages/Home/HomeIndex"));
+const ProfilePage = lazy(() => import("../pages/Profile/ProfilePage"));
 const CategoryEvents = lazy(
   () => import("../pages/CategoryEvents/CategoryEvents"),
 );
@@ -52,7 +53,20 @@ export default function RoutesPage() {
       >
         <Route
           index
-          element={<Home />}
+          element={<HomeIndex />}
+        />
+        <Route
+          path="profile"
+          element={<ProfilePage />}
+        />
+        <Route
+          path="events"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
         />
         <Route
           path="event/:category_id/:event_id"

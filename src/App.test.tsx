@@ -25,5 +25,22 @@ test("keeps the auth callback route", async () => {
     </MemoryRouter>,
   );
 
-  expect(await screen.findByText("Iniciando sesión...")).toBeInTheDocument();
+  expect(
+    await screen.findByText("Estamos iniciando tu sesión"),
+  ).toBeInTheDocument();
+});
+
+test("forwards an OAuth code from / to /auth/callback", async () => {
+  render(
+    <MemoryRouter initialEntries={["/?code=oauth-placeholder"]}>
+      <RoutesPage />
+    </MemoryRouter>,
+  );
+
+  expect(
+    await screen.findByText("Estamos iniciando tu sesión", {}, { timeout: 4000 }),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByText("Elegí una categoría y anotá tu lugar."),
+  ).not.toBeInTheDocument();
 });

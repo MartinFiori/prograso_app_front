@@ -1,15 +1,6 @@
 import { getAppOrigin, getAuthRedirectTo } from "./appUrl";
 
 describe("appUrl", () => {
-  const originalLocation = window.location;
-
-  afterEach(() => {
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: originalLocation,
-    });
-  });
-
   test("uses REACT_APP_SITE_URL without a trailing slash", () => {
     expect(
       getAuthRedirectTo({
@@ -19,45 +10,52 @@ describe("appUrl", () => {
     ).toBe("https://app.example.com/auth/callback");
   });
 
-  test("falls back to window.location.origin", () => {
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: { origin: "https://spa.example" },
-    });
-
+  test("falls back to the browser origin", () => {
     expect(
       getAuthRedirectTo({
         siteUrl: "",
         nodeEnv: "development",
+        browserOrigin: "https://spa.example",
       }),
     ).toBe("https://spa.example/auth/callback");
   });
 
-  test("production ignores a localhost site URL", () => {
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: { origin: "https://prod.example" },
-    });
-
-    expect(
+  test("production throws when the configured site URL is localhost", () => {
+    expect(() =>
       getAuthRedirectTo({
         siteUrl: "http://localhost:3000",
         nodeEnv: "production",
+        browserOrigin: "https://prod.example",
       }),
-    ).toBe("https://prod.example/auth/callback");
+    ).toThrow(/localhost en production/);
   });
 
   test("production without site URL uses the browser origin", () => {
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: { origin: "https://prod.example" },
-    });
-
     expect(
-      getAppOrigin({
+      getAuthRedirectTo({
         siteUrl: "",
         nodeEnv: "production",
+        browserOrigin: "https://prograso-app.vercel.app",
       }),
-    ).toBe("https://prod.example");
+    ).toBe("https://prograso-app.vercel.app/auth/callback");
+  });
+
+  test("local development may use localhost", () => {
+    expect(
+      getAuthRedirectTo({
+        siteUrl: "",
+        nodeEnv: "development",
+        browserOrigin: "http://localhost:3000",
+      }),
+    ).toBe("http://localhost:3000/auth/callback");
+  });
+
+  test("getAppOrigin strips a trailing slash", () => {
+    expect(
+      getAppOrigin({
+        siteUrl: "https://app.example.com/",
+        nodeEnv: "development",
+      }),
+    ).toBe("https://app.example.com");
   });
 });

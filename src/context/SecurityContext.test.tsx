@@ -54,8 +54,6 @@ function Probe() {
 }
 
 describe("SecurityProvider", () => {
-  const originalLocation = window.location;
-
   beforeEach(() => {
     (supabase.auth.getSession as jest.Mock).mockResolvedValue({
       data: { session: null },
@@ -68,17 +66,6 @@ describe("SecurityProvider", () => {
       error: null,
     });
     (supabase.auth.signOut as jest.Mock).mockResolvedValue({ error: null });
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: { origin: "https://app.example" },
-    });
-  });
-
-  afterEach(() => {
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: originalLocation,
-    });
   });
 
   test("login sends redirectTo for /auth/callback", async () => {

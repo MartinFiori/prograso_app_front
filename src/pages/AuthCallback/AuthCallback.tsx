@@ -1,44 +1,48 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "../../components/Button/Button";
 import { PadelLoader } from "../../components/PadelLoader/PadelLoader";
 import { useSecurity } from "../../context/SecurityContext";
 import { authLog } from "../../utils/authLog";
+import { isProfileComplete } from "../../utils/profileCompleteness";
 import styles from "./AuthCallback.module.scss";
 
 const AUTH_CALLBACK_TIMEOUT_MS = 8000;
 
-function getCallbackError(): string | null {
-  const search = new URLSearchParams(window.location.search);
-  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+function getCallbackError(search: string, hash: string): string | null {
+  const searchParams = new URLSearchParams(search);
+  const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
 
   return (
-    search.get("error_description") ||
-    search.get("error") ||
-    hash.get("error_description") ||
-    hash.get("error")
+    searchParams.get("error_description") ||
+    searchParams.get("error") ||
+    hashParams.get("error_description") ||
+    hashParams.get("error")
   );
 }
 
-function hasOAuthCode(): boolean {
-  const search = new URLSearchParams(window.location.search);
-  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+function hasOAuthCode(search: string, hash: string): boolean {
+  const searchParams = new URLSearchParams(search);
+  const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
 
-  return search.has("code") || hash.has("code");
+  return searchParams.has("code") || hashParams.has("code");
 }
 
 export default function AuthCallback() {
-  const { isAuthenticated, loading } = useSecurity();
+  const { isAuthenticated, loading, profile, profileLoading, login } =
+    useSecurity();
   const navigate = useNavigate();
+  const location = useLocation();
   const [status, setStatus] = useState<"processing" | "error">("processing");
   const [errorMessage, setErrorMessage] = useState(
-    "No pudimos completar el inicio de sesión. Probá de nuevo.",
+    "Intentá nuevamente o regresá al inicio.",
   );
+  const [devDetail, setDevDetail] = useState<string | null>(null);
 
   useEffect(() => {
-    const urlError = getCallbackError();
-    const hasCode = hasOAuthCode();
+    const urlError = getCallbackError(location.search, location.hash);
+    const hasCode = hasOAuthCode(location.search, location.hash);
 
     authLog("callback mounted", {
       hasCode,
@@ -47,15 +51,20 @@ export default function AuthCallback() {
 
     if (urlError) {
       setStatus("error");
-      setErrorMessage(
-        "Google o Supabase no pudieron completar el acceso. Probá de nuevo.",
-      );
+      setErrorMessage("Intentá nuevamente o regresá al inicio.");
+      if (process.env.NODE_ENV === "development") {
+        setDevDetail(urlError);
+      }
       authLog("callback url error");
     }
-  }, []);
+  }, [location.hash, location.search]);
 
   useEffect(() => {
     if (status === "error") {
+      return;
+    }
+
+    if (loading || (isAuthenticated && profileLoading)) {
       return;
     }
 
@@ -63,9 +72,17 @@ export default function AuthCallback() {
       return;
     }
 
-    authLog("callback success, navigate /");
-    navigate("/", { replace: true });
-  }, [isAuthenticated, navigate, status]);
+    const nextPath = isProfileComplete(profile) ? "/" : "/profile";
+    authLog("callback success, navigate", { nextPath });
+    navigate(nextPath, { replace: true });
+  }, [
+    isAuthenticated,
+    loading,
+    navigate,
+    profile,
+    profileLoading,
+    status,
+  ]);
 
   useEffect(() => {
     if (status === "error" || isAuthenticated) {
@@ -73,14 +90,8 @@ export default function AuthCallback() {
     }
 
     const timeoutId = window.setTimeout(() => {
-      if (isAuthenticated) {
-        return;
-      }
-
       setStatus("error");
-      setErrorMessage(
-        "Se agotó el tiempo para completar el inicio de sesión. Probá de nuevo.",
-      );
+      setErrorMessage("Intentá nuevamente o regresá al inicio.");
       authLog("callback timeout", { loading });
     }, AUTH_CALLBACK_TIMEOUT_MS);
 
@@ -96,16 +107,30 @@ export default function AuthCallback() {
           className={styles.error}
           role="alert"
         >
-          <h1>No pudimos iniciar sesión</h1>
+          <h1>No pudimos iniciar tu sesión</h1>
           <p>{errorMessage}</p>
-          <Button
-            onClick={() => {
-              authLog("callback go home after error");
-              navigate("/", { replace: true });
-            }}
-          >
-            Volver al inicio
-          </Button>
+          {devDetail ? (
+            <p className={styles.devDetail}>{devDetail}</p>
+          ) : null}
+          <div className={styles.actions}>
+            <Button
+              onClick={() => {
+                authLog("callback retry login");
+                void login();
+              }}
+            >
+              Intentar nuevamente
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                authLog("callback go home after error");
+                navigate("/", { replace: true });
+              }}
+            >
+              Volver al inicio
+            </Button>
+          </div>
         </div>
       </main>
     );
@@ -113,7 +138,13 @@ export default function AuthCallback() {
 
   return (
     <main className={styles.page}>
-      <PadelLoader label="Iniciando sesión..." />
+      <div
+        className={styles.processing}
+        aria-live="polite"
+      >
+        <PadelLoader label="Estamos iniciando tu sesión" />
+        <p>Esto puede tardar unos segundos</p>
+      </div>
     </main>
   );
 }
