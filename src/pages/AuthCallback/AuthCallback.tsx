@@ -59,12 +59,14 @@ export default function AuthCallback() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log({event, session})
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
         goHome();
       }
     });
 
     void supabase.auth.getSession().then(({ data, error }) => {
+      console.log({data, error})
       if (cancelled) {
         return;
       }
@@ -81,6 +83,7 @@ export default function AuthCallback() {
 
     const timeoutId = window.setTimeout(() => {
       void supabase.auth.getSession().then(({ data, error }) => {
+        console.log({data, error})
         if (error || !data.session) {
           goError(error ?? "Tiempo de espera agotado al completar el login");
           return;
