@@ -132,12 +132,10 @@ export default function EventDetail() {
           <dt>Cupo</dt>
           <dd>{formatCapacity(event.capacity)}</dd>
         </div>
-        {priceLabel ? (
-          <div>
-            <dt>Precio</dt>
-            <dd>{priceLabel}</dd>
-          </div>
-        ) : null}
+        <div>
+          <dt>Precio</dt>
+          <dd>{priceLabel}</dd>
+        </div>
         <div>
           <dt>Categoría</dt>
           <dd>{event.category.name}</dd>

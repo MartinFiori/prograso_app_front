@@ -8,7 +8,7 @@ import {
 import { Modal } from "../../../components/Modal/Modal";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
 import { useAdminUserList } from "../../../hooks/useAdminUsers";
-import type { AdminUser } from "../../../types/admin";
+import type { AdminUser, InviteUserBody } from "../../../types/admin";
 import { formatEventDateTime } from "../../../utils/eventDisplay";
 import { ResourcePager } from "../ResourcePager";
 import styles from "../adminShared.module.scss";
@@ -61,17 +61,19 @@ export default function UsersList() {
       return;
     }
 
+    if (!name.trim()) {
+      setInviteError("El nombre es obligatorio.");
+      return;
+    }
+
     setInviting(true);
     setInviteError(null);
 
-    const body: { email: string; name?: string; role: "user" | "admin" } = {
+    const body: InviteUserBody = {
       email: email.trim(),
+      name: name.trim(),
       role,
     };
-
-    if (name.trim()) {
-      body.name = name.trim();
-    }
 
     const error = await invite(body);
     setInviting(false);
@@ -262,12 +264,13 @@ export default function UsersList() {
             />
           </label>
           <label className={styles.field}>
-            <span className={styles.label}>Nombre</span>
+            <span className={styles.label}>Nombre *</span>
             <input
               className={styles.input}
               name="name"
               value={name}
               onChange={(changeEvent) => setName(changeEvent.target.value)}
+              required
             />
           </label>
           <label className={styles.field}>

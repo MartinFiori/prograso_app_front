@@ -9,6 +9,17 @@
   display: block;
 }
 
+.md {
+  width: 48px;
+  height: 48px;
+}
+
+.lg {
+  width: 96px;
+  height: 96px;
+  font-size: 2rem;
+}
+
 .fallback {
   display: inline-flex;
   align-items: center;

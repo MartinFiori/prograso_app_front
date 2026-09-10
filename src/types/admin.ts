@@ -12,6 +12,7 @@ export type CreateEventBody = {
   title: string;
   starts_at: string;
   capacity: number;
+  price: number;
   registration_deadline?: string | null;
   status_code?: string;
 };
@@ -22,6 +23,7 @@ export type UpdateEventBody = {
   starts_at?: string;
   registration_deadline?: string | null;
   capacity?: number;
+  price?: number;
   status_code?: string;
 };
 
@@ -66,7 +68,7 @@ export type EventRegistrationAccess = {
 export type AdminUser = {
   id: string;
   email: string | null;
-  name: string | null;
+  name: string;
   avatar_url: string | null;
   role: "user" | "admin" | string;
   created_at: string;
@@ -90,7 +92,7 @@ export type ListAdminUsersQuery = {
 
 export type InviteUserBody = {
   email: string;
-  name?: string;
+  name: string;
   role?: "admin" | "user";
 };
 
@@ -110,7 +112,7 @@ export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 export type AuditLog = {
   id: number;
   actor_user_id: string | null;
-  target_user_id: string | null;
+  target_user_id: string;
   action: string;
   reason: string | null;
   previous_values: unknown;

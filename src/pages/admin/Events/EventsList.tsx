@@ -9,7 +9,7 @@ import { Modal } from "../../../components/Modal/Modal";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
 import { useAdminEventList } from "../../../hooks/useAdminEvents";
 import type { AdminEvent } from "../../../types/admin";
-import { formatEventDateTime } from "../../../utils/eventDisplay";
+import { formatEventDateTime, formatPrice } from "../../../utils/eventDisplay";
 import { ResourcePager } from "../ResourcePager";
 import styles from "../adminShared.module.scss";
 import EventForm from "./EventForm";
@@ -243,7 +243,7 @@ export default function EventsList() {
                 ),
               },
               { label: "Cupo", value: emptyDisplay(detail.capacity) },
-              { label: "Precio", value: emptyDisplay(detail.price) },
+              { label: "Precio", value: formatPrice(detail.price) },
               { label: "Estado", value: detail.status_code },
               { label: "Creado por", value: emptyDisplay(detail.created_by) },
               {

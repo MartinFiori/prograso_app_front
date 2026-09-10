@@ -16,20 +16,30 @@ import {
   isConnectionError,
   useConnection,
 } from "../hooks/useConnection";
+import type { ConnectionError } from "../hooks/useConnection";
 import { getMePath } from "../services/eventsApi";
 import type { ApiResponse } from "../types";
 import type { MeProfile } from "../types/me";
+
+export type ProfileLoadError = {
+  message: string;
+  errorCode?: string;
+  status: number;
+};
 
 export type SecurityContextType = {
   user: User | null;
   loading: boolean;
   profile: MeProfile | null;
   profileLoading: boolean;
+  profileError: ProfileLoadError | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   loadSession: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+  applyProfile: (next: MeProfile) => void;
 };
 
 type SecurityProviderProps = {
@@ -38,11 +48,23 @@ type SecurityProviderProps = {
 
 export const SecurityContext = createContext<SecurityContextType | null>(null);
 
+function toProfileLoadError(result: ConnectionError): ProfileLoadError {
+  return {
+    message: result.message,
+    errorCode:
+      typeof result.errorCode === "string" ? result.errorCode : undefined,
+    status: result.status,
+  };
+}
+
 export function SecurityProvider({ children }: SecurityProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<MeProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState<ProfileLoadError | null>(
+    null,
+  );
   const connection = useConnection();
 
   const loadSession = useCallback(async () => {
@@ -98,6 +120,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
 
       setUser(null);
       setProfile(null);
+      setProfileError(null);
       authLog("logout ok");
     } catch (error: unknown) {
       authLog("logout error", {
@@ -107,6 +130,38 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const fetchProfile = useCallback(async () => {
+    const userId = user?.id;
+
+    if (!userId) {
+      setProfile(null);
+      setProfileError(null);
+      setProfileLoading(false);
+      return;
+    }
+
+    setProfileLoading(true);
+
+    const result = await connection<ApiResponse<MeProfile>>({
+      url: getMePath(),
+    });
+
+    if (isConnectionError(result)) {
+      setProfile(null);
+      setProfileError(toProfileLoadError(result));
+    } else {
+      setProfile(result.data);
+      setProfileError(null);
+    }
+
+    setProfileLoading(false);
+  }, [connection, user?.id]);
+
+  const applyProfile = useCallback((next: MeProfile) => {
+    setProfile(next);
+    setProfileError(null);
   }, []);
 
   useEffect(() => {
@@ -136,37 +191,8 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   }, [loadSession]);
 
   useEffect(() => {
-    const userId = user?.id;
-
-    if (!userId) {
-      setProfile(null);
-      setProfileLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-    setProfileLoading(true);
-
-    void connection<ApiResponse<MeProfile>>({ url: getMePath() }).then(
-      (result) => {
-        if (cancelled) {
-          return;
-        }
-
-        if (isConnectionError(result)) {
-          setProfile(null);
-        } else {
-          setProfile(result.data);
-        }
-
-        setProfileLoading(false);
-      },
-    );
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id, connection]);
+    void fetchProfile();
+  }, [fetchProfile]);
 
   const value = useMemo<SecurityContextType>(
     () => ({
@@ -174,13 +200,27 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
       loading,
       profile,
       profileLoading,
+      profileError,
       isAuthenticated: Boolean(user),
       isAdmin: profile?.role === "admin",
       login,
       logout,
       loadSession,
+      refreshProfile: fetchProfile,
+      applyProfile,
     }),
-    [user, loading, profile, profileLoading, login, logout, loadSession],
+    [
+      user,
+      loading,
+      profile,
+      profileLoading,
+      profileError,
+      login,
+      logout,
+      loadSession,
+      fetchProfile,
+      applyProfile,
+    ],
   );
 
   return (

@@ -43,7 +43,7 @@ export function EventCard({ event, statuses }: EventCardProps) {
             {formatEventDateTime(event.starts_at)}
           </time>
           <span>{formatCapacity(event.capacity)}</span>
-          {priceLabel ? <span>{priceLabel}</span> : null}
+          <span>{priceLabel}</span>
         </div>
       }
     >

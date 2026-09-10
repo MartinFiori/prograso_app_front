@@ -5,18 +5,20 @@ import styles from "./Avatar.module.scss";
 interface AvatarProps {
   src?: string | null;
   name?: string;
+  size?: "md" | "lg";
 }
 
-export function Avatar({ src, name = "Usuario" }: AvatarProps) {
+export function Avatar({ src, name = "Usuario", size = "md" }: AvatarProps) {
   const [failed, setFailed] = useState(false);
   const label = `Foto de perfil de ${name}`;
+  const className = `${styles.avatar} ${styles[size]}`;
 
   if (!src || failed) {
     const initial = name.trim().charAt(0) || "?";
 
     return (
       <span
-        className={`${styles.avatar} ${styles.fallback}`}
+        className={`${className} ${styles.fallback}`}
         role="img"
         aria-label={label}
       >
@@ -27,7 +29,7 @@ export function Avatar({ src, name = "Usuario" }: AvatarProps) {
 
   return (
     <img
-      className={styles.avatar}
+      className={className}
       src={src}
       alt={label}
       referrerPolicy="no-referrer"

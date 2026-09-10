@@ -3,13 +3,18 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 
 import Navbar from "./Navbar";
+import type { MeProfile } from "../../types/me";
 
 const mockSecurity = {
   login: jest.fn(),
   logout: jest.fn(),
   isAuthenticated: false,
   isAdmin: false,
-  user: null as { user_metadata?: { full_name?: string } } | null,
+  user: null as {
+    email?: string;
+    user_metadata?: { full_name?: string; avatar_url?: string };
+  } | null,
+  profile: null as MeProfile | null,
   loading: false,
 };
 
@@ -32,6 +37,7 @@ describe("Navbar", () => {
     mockSecurity.isAuthenticated = false;
     mockSecurity.isAdmin = false;
     mockSecurity.user = null;
+    mockSecurity.profile = null;
     mockSecurity.loading = false;
   });
 
@@ -80,14 +86,57 @@ describe("Navbar", () => {
     ).not.toBeInTheDocument();
   });
 
-  test("logout is available when authenticated", async () => {
+  test("links avatar and name to profile without a header logout", () => {
     mockSecurity.isAuthenticated = true;
-    mockSecurity.user = { user_metadata: { full_name: "Ada" } };
+    mockSecurity.profile = {
+      id: "1",
+      role: "user",
+      name: "Ada",
+      avatar_url: null,
+      category: null,
+      gender: null,
+      phone_number: null,
+    };
 
     renderNavbar();
 
-    await userEvent.click(screen.getByRole("button", { name: "Cerrar sesión" }));
+    expect(
+      screen.getByRole("link", { name: "Mi perfil, Ada" }),
+    ).toHaveAttribute("href", "/profile");
+    expect(
+      screen.queryByRole("button", { name: "Cerrar sesión" }),
+    ).not.toBeInTheDocument();
+  });
 
-    expect(mockSecurity.logout).toHaveBeenCalled();
+  test("falls back to Usuario when there is no name", () => {
+    mockSecurity.isAuthenticated = true;
+    mockSecurity.user = { user_metadata: {} };
+
+    renderNavbar();
+
+    expect(
+      screen.getByRole("link", { name: "Mi perfil, Usuario" }),
+    ).toBeInTheDocument();
+  });
+
+  test("keeps Admin for admin role", () => {
+    mockSecurity.isAuthenticated = true;
+    mockSecurity.isAdmin = true;
+    mockSecurity.profile = {
+      id: "1",
+      role: "admin",
+      name: "Ada",
+      avatar_url: null,
+      category: null,
+      gender: null,
+      phone_number: null,
+    };
+
+    renderNavbar();
+
+    expect(screen.getByRole("link", { name: "Admin" })).toHaveAttribute(
+      "href",
+      "/admin",
+    );
   });
 });

@@ -1,19 +1,24 @@
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
 
 import { Avatar } from "../Avatar/Avatar";
 import { Button } from "../Button/Button";
 import { useSecurity } from "../../context/SecurityContext";
+import {
+  profileAvatarSrc,
+  profileDisplayName,
+} from "../../utils/profileDisplay";
 import styles from "./Navbar.module.scss";
 
 export default function Navbar() {
-  const { login, logout, isAuthenticated, isAdmin, user, loading } =
+  const { login, isAuthenticated, isAdmin, user, profile, loading } =
     useSecurity();
   const location = useLocation();
   const [loginBusy, setLoginBusy] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const onCallback = location.pathname === "/auth/callback";
   const hideLogin = loading || onCallback || loginBusy;
+  const displayName = profileDisplayName(profile, user);
 
   async function handleLogin(): Promise<void> {
     setLoginBusy(true);
@@ -60,24 +65,17 @@ export default function Navbar() {
         ) : null}
 
         {isAuthenticated ? (
-          <div className={styles.avatar_container}>
-            <Avatar
-              src={user?.user_metadata?.avatar_url}
-              name={user?.user_metadata?.full_name}
-            />
-            <p className={styles.user_name}>{user?.user_metadata?.full_name}</p>
-          </div>
-        ) : null}
-
-        {isAuthenticated ? (
-          <Button
-            variant="ghost"
-            onClick={() => {
-              void logout();
-            }}
+          <Link
+            className={styles.profile_link}
+            to="/profile"
+            aria-label={`Mi perfil, ${displayName}`}
           >
-            Cerrar sesión
-          </Button>
+            <Avatar
+              src={profileAvatarSrc(profile, user)}
+              name={displayName}
+            />
+            <span className={styles.user_name}>{displayName}</span>
+          </Link>
         ) : hideLogin ? (
           loading || onCallback ? null : (
             <Button

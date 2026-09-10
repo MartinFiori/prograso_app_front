@@ -238,14 +238,14 @@ describe("CategoryEvents", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  test("hides price when it is null and does not invent Gratis", async () => {
+  test("shows formatted price and does not invent Gratis", async () => {
     mockCategoryFetch({
-      events: [{ ...publicEvent, price: null }],
+      events: [{ ...publicEvent, price: 15000 }],
     });
     renderCategory("/event/2");
 
     expect(await screen.findByText("Encuentro del viernes")).toBeInTheDocument();
-    expect(screen.queryByText(/15\.000/)).not.toBeInTheDocument();
+    expect(screen.getByText(/15/)).toBeInTheDocument();
     expect(screen.queryByText("Gratis")).not.toBeInTheDocument();
   });
 

@@ -88,6 +88,9 @@ describe("AuthCallback", () => {
       role: "user",
       name: "Ana",
       avatar_url: null,
+      category: null,
+      gender: null,
+      phone_number: null,
     };
 
     renderCallback();

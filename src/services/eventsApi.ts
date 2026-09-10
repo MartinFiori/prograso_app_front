@@ -74,6 +74,10 @@ export function getMePath(): string {
   return "/me";
 }
 
+export function patchMePath(): string {
+  return "/me";
+}
+
 export function listStatusesPath(): string {
   return "/event-statuses";
 }

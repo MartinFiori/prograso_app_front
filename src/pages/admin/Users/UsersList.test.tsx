@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
@@ -91,8 +91,14 @@ describe("UsersList", () => {
     expect(screen.getByText(/Página 1 de 1 \(1 usuarios\)/)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "+ Crear usuario" }));
-    await userEvent.type(screen.getByLabelText(/Email/), "nueva@example.com");
-    await userEvent.click(screen.getByRole("button", { name: "Invitar" }));
+    const createDialog = await screen.findByRole("dialog", { name: "Crear usuario" });
+    fireEvent.change(within(createDialog).getByLabelText(/Email/), {
+      target: { value: "nueva@example.com" },
+    });
+    fireEvent.change(within(createDialog).getByLabelText(/Nombre/), {
+      target: { value: "Nueva Persona" },
+    });
+    fireEvent.submit(within(createDialog).getByRole("button", { name: "Invitar" }).closest("form")!);
 
     await waitFor(() => {
       const inviteCall = (global.fetch as jest.Mock).mock.calls.find(

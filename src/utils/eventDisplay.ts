@@ -33,11 +33,7 @@ const priceFormatter = new Intl.NumberFormat("es-AR", {
   maximumFractionDigits: 0,
 });
 
-export function formatPrice(price: number | null): string | null {
-  if (price == null) {
-    return null;
-  }
-
+export function formatPrice(price: number): string {
   return priceFormatter.format(price);
 }
 

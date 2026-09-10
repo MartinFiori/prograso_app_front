@@ -11,7 +11,7 @@ export type PublicEvent = {
   starts_at: string;
   registration_deadline: string | null;
   capacity: number;
-  price: number | null;
+  price: number;
   status_code: string;
   category: EventCategoryEmbed;
 };
@@ -39,6 +39,8 @@ export type PublicEventStatusCode = (typeof PUBLIC_EVENT_STATUS_CODES)[number];
 export type ListEventsQuery = {
   category_id?: number;
   status_code?: string;
+  starts_from?: string;
+  starts_to?: string;
   page?: number;
   limit?: number;
 };

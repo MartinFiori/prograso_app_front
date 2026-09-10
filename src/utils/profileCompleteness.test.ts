@@ -12,6 +12,9 @@ describe("isProfileComplete", () => {
         role: "user",
         name: "  ",
         avatar_url: null,
+        category: null,
+        gender: null,
+        phone_number: null,
       }),
     ).toBe(false);
   });
@@ -23,6 +26,9 @@ describe("isProfileComplete", () => {
         role: "user",
         name: "Ana",
         avatar_url: null,
+        category: null,
+        gender: null,
+        phone_number: null,
       }),
     ).toBe(true);
   });

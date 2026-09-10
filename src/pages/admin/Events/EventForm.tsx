@@ -40,6 +40,7 @@ export default function EventForm({
   const [startsAt, setStartsAt] = useState("");
   const [deadline, setDeadline] = useState("");
   const [capacity, setCapacity] = useState("16");
+  const [price, setPrice] = useState("");
   const [statusCode, setStatusCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -55,6 +56,7 @@ export default function EventForm({
     setStartsAt(isoToDatetimeLocal(event.starts_at));
     setDeadline(isoToDatetimeLocal(event.registration_deadline));
     setCapacity(String(event.capacity));
+    setPrice(String(event.price));
     setStatusCode(event.status_code);
   }, [mode, detail.state]);
 
@@ -63,10 +65,18 @@ export default function EventForm({
     const trimmedTitle = title.trim();
     const parsedCategory = Number(categoryId);
     const parsedCapacity = Number(capacity);
+    const parsedPrice = Number(price);
     const startsAtIso = datetimeLocalToIso(startsAt);
 
-    if (!trimmedTitle || !parsedCategory || !startsAtIso || parsedCapacity < 1) {
-      setError("Completá título, categoría, inicio y cupo.");
+    if (
+      !trimmedTitle ||
+      !parsedCategory ||
+      !startsAtIso ||
+      parsedCapacity < 1 ||
+      !Number.isInteger(parsedPrice) ||
+      parsedPrice < 1
+    ) {
+      setError("Completá título, categoría, inicio, cupo y precio (entero mayor a 0).");
       return;
     }
 
@@ -76,6 +86,7 @@ export default function EventForm({
       title: trimmedTitle,
       starts_at: startsAtIso,
       capacity: parsedCapacity,
+      price: parsedPrice,
     };
 
     if (deadlineIso) {
@@ -214,6 +225,20 @@ export default function EventForm({
           min={1}
           value={capacity}
           onChange={(changeEvent) => setCapacity(changeEvent.target.value)}
+          required
+        />
+      </label>
+
+      <label className={styles.field}>
+        <span className={styles.label}>Precio *</span>
+        <input
+          className={styles.input}
+          type="number"
+          name="price"
+          min={1}
+          step={1}
+          value={price}
+          onChange={(changeEvent) => setPrice(changeEvent.target.value)}
           required
         />
       </label>

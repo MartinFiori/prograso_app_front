@@ -24,7 +24,7 @@ const eventsBody = {
       starts_at: "2026-09-20T21:00:00.000Z",
       registration_deadline: null,
       capacity: 16,
-      price: null,
+      price: 15000,
       status_code: "draft",
       created_by: "11111111-1111-4111-8111-111111111111",
       created_at: "2026-09-08T12:00:00.000Z",

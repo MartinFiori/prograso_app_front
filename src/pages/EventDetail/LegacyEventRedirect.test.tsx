@@ -83,7 +83,7 @@ describe("LegacyEventRedirect", () => {
           starts_at: "2026-09-04T21:00:00.000Z",
           registration_deadline: null,
           capacity: 16,
-          price: null,
+          price: 15000,
           status_code: "open",
           category: { id: 2, name: "Encuentro abierto", image_url: null },
         },

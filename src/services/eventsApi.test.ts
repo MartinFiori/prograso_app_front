@@ -6,6 +6,7 @@ import {
   getAdminEventByIdPath,
   getCategoryByIdPath,
   getMePath,
+  patchMePath,
   getMyRegistrationPath,
   listAdminEventsPath,
   listAdminRegistrationsPath,
@@ -61,6 +62,7 @@ describe("eventsApi", () => {
 
   test("builds category and me paths", () => {
     expect(getMePath()).toBe("/me");
+    expect(patchMePath()).toBe("/me");
     expect(listCategoriesPath()).toBe("/event-categories");
     expect(createCategoryPath()).toBe("/event-categories");
     expect(getCategoryByIdPath(2)).toBe("/event-categories/2");

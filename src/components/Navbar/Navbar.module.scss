@@ -67,6 +67,27 @@
   font-weight: var(--font-weight-semibold);
 }
 
+.profile_link {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-3);
+  align-items: center;
+  min-height: var(--touch-target-min);
+  padding: var(--spacing-1);
+  margin: 0;
+  border-radius: var(--radius-md);
+
+  color: inherit;
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+
+  @include interactive-focus;
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
 .user_name {
   max-width: 14rem;
   overflow: hidden;
