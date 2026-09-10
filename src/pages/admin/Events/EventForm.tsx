@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "../../../components/Button/Button";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
@@ -17,12 +16,22 @@ import styles from "../adminShared.module.scss";
 
 interface EventFormProps {
   mode: "create" | "edit";
+  eventId?: number;
+  onSaved: () => void;
+  onCancel: () => void;
+  onBusyChange?: (busy: boolean) => void;
 }
 
-export default function EventForm({ mode }: EventFormProps) {
-  const navigate = useNavigate();
-  const { id: rawId } = useParams();
-  const detail = useAdminEventDetail(mode === "edit" ? rawId : undefined);
+export default function EventForm({
+  mode,
+  eventId,
+  onSaved,
+  onCancel,
+  onBusyChange,
+}: EventFormProps) {
+  const detail = useAdminEventDetail(
+    mode === "edit" && eventId != null ? String(eventId) : undefined,
+  );
   const { create, update } = useAdminEventMutations();
   const lookups = useEventFormLookups();
 
@@ -80,6 +89,7 @@ export default function EventForm({ mode }: EventFormProps) {
     }
 
     setSaving(true);
+    onBusyChange?.(true);
     setError(null);
 
     const result =
@@ -90,44 +100,31 @@ export default function EventForm({ mode }: EventFormProps) {
           : await update(detail.id, body);
 
     setSaving(false);
+    onBusyChange?.(false);
 
     if ("error" in result && result.error) {
       setError(result.error);
       return;
     }
 
-    navigate("/admin/eventos");
+    onSaved();
   }
 
   if (mode === "edit" && detail.state.status === "loading") {
-    return (
-      <main className={styles.page}>
-        <PadelLoader label="Cargando evento..." />
-      </main>
-    );
+    return <PadelLoader label="Cargando evento..." />;
   }
 
   if (mode === "edit" && detail.state.status === "invalid-id") {
-    return (
-      <main className={styles.page}>
-        <h1>Evento no válido</h1>
-        <Link to="/admin/eventos">Volver</Link>
-      </main>
-    );
+    return <p className={styles.error}>Evento no válido</p>;
   }
 
   if (mode === "edit" && detail.state.status === "not-found") {
-    return (
-      <main className={styles.page}>
-        <h1>Evento no encontrado</h1>
-        <Link to="/admin/eventos">Volver</Link>
-      </main>
-    );
+    return <p className={styles.error}>Evento no encontrado</p>;
   }
 
   if (mode === "edit" && detail.state.status === "error") {
     return (
-      <main className={styles.page}>
+      <div>
         <p
           className={styles.error}
           role="alert"
@@ -135,14 +132,15 @@ export default function EventForm({ mode }: EventFormProps) {
           {detail.state.message}
         </p>
         <Button onClick={() => void detail.reload()}>Reintentar</Button>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className={styles.page}>
-      <h1>{mode === "create" ? "Nuevo evento" : "Editar evento"}</h1>
-
+    <form
+      className={styles.form}
+      onSubmit={(formEvent) => void handleSubmit(formEvent)}
+    >
       {lookups.error ? (
         <p
           className={styles.error}
@@ -152,127 +150,122 @@ export default function EventForm({ mode }: EventFormProps) {
         </p>
       ) : null}
 
-      <form
-        className={styles.form}
-        onSubmit={(formEvent) => void handleSubmit(formEvent)}
-      >
-        <label className={styles.field}>
-          <span className={styles.label}>Título</span>
-          <input
-            className={styles.input}
-            name="title"
-            value={title}
-            onChange={(changeEvent) => setTitle(changeEvent.target.value)}
-            required
-          />
-        </label>
+      <label className={styles.field}>
+        <span className={styles.label}>Título *</span>
+        <input
+          className={styles.input}
+          name="title"
+          value={title}
+          onChange={(changeEvent) => setTitle(changeEvent.target.value)}
+          required
+        />
+      </label>
 
-        <label className={styles.field}>
-          <span className={styles.label}>Categoría</span>
-          <select
-            className={styles.select}
-            name="category_id"
-            value={categoryId}
-            onChange={(changeEvent) => setCategoryId(changeEvent.target.value)}
-            required
-          >
-            <option value="">Elegí una categoría</option>
-            {lookups.categories.map((category) => (
-              <option
-                key={category.id}
-                value={category.id}
-              >
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className={styles.field}>
-          <span className={styles.label}>Inicio</span>
-          <input
-            className={styles.input}
-            type="datetime-local"
-            name="starts_at"
-            value={startsAt}
-            onChange={(changeEvent) => setStartsAt(changeEvent.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          <span className={styles.label}>Límite de inscripción</span>
-          <input
-            className={styles.input}
-            type="datetime-local"
-            name="registration_deadline"
-            value={deadline}
-            onChange={(changeEvent) => setDeadline(changeEvent.target.value)}
-          />
-        </label>
-
-        <label className={styles.field}>
-          <span className={styles.label}>Cupo</span>
-          <input
-            className={styles.input}
-            type="number"
-            name="capacity"
-            min={1}
-            value={capacity}
-            onChange={(changeEvent) => setCapacity(changeEvent.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          <span className={styles.label}>Estado</span>
-          <select
-            className={styles.select}
-            name="status_code"
-            value={statusCode}
-            onChange={(changeEvent) => setStatusCode(changeEvent.target.value)}
-          >
-            <option value="">
-              {mode === "create" ? "Borrador (por defecto)" : "Sin cambios"}
+      <label className={styles.field}>
+        <span className={styles.label}>Categoría *</span>
+        <select
+          className={styles.select}
+          name="category_id"
+          value={categoryId}
+          onChange={(changeEvent) => setCategoryId(changeEvent.target.value)}
+          required
+        >
+          <option value="">Elegí una categoría</option>
+          {lookups.categories.map((category) => (
+            <option
+              key={category.id}
+              value={category.id}
+            >
+              {category.name}
             </option>
-            {lookups.statuses.map((status) => (
-              <option
-                key={status.code}
-                value={status.code}
-              >
-                {status.label}
-              </option>
-            ))}
-          </select>
-        </label>
+          ))}
+        </select>
+      </label>
 
-        {error ? (
-          <p
-            className={styles.error}
-            role="alert"
-          >
-            {error}
-          </p>
-        ) : null}
+      <label className={styles.field}>
+        <span className={styles.label}>Inicio *</span>
+        <input
+          className={styles.input}
+          type="datetime-local"
+          name="starts_at"
+          value={startsAt}
+          onChange={(changeEvent) => setStartsAt(changeEvent.target.value)}
+          required
+        />
+      </label>
 
-        <div className={styles.actions}>
-          <Button
-            type="submit"
-            loading={saving}
-            loadingText="Guardando..."
-          >
-            Guardar
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={saving}
-            onClick={() => navigate("/admin/eventos")}
-          >
-            Cancelar
-          </Button>
-        </div>
-      </form>
-    </main>
+      <label className={styles.field}>
+        <span className={styles.label}>Límite de inscripción</span>
+        <input
+          className={styles.input}
+          type="datetime-local"
+          name="registration_deadline"
+          value={deadline}
+          onChange={(changeEvent) => setDeadline(changeEvent.target.value)}
+        />
+      </label>
+
+      <label className={styles.field}>
+        <span className={styles.label}>Cupo *</span>
+        <input
+          className={styles.input}
+          type="number"
+          name="capacity"
+          min={1}
+          value={capacity}
+          onChange={(changeEvent) => setCapacity(changeEvent.target.value)}
+          required
+        />
+      </label>
+
+      <label className={styles.field}>
+        <span className={styles.label}>Estado</span>
+        <select
+          className={styles.select}
+          name="status_code"
+          value={statusCode}
+          onChange={(changeEvent) => setStatusCode(changeEvent.target.value)}
+        >
+          <option value="">
+            {mode === "create" ? "Borrador (por defecto)" : "Sin cambios"}
+          </option>
+          {lookups.statuses.map((status) => (
+            <option
+              key={status.code}
+              value={status.code}
+            >
+              {status.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {error ? (
+        <p
+          className={styles.error}
+          role="alert"
+        >
+          {error}
+        </p>
+      ) : null}
+
+      <div className={styles.actions}>
+        <Button
+          type="submit"
+          loading={saving}
+          loadingText="Guardando..."
+        >
+          Guardar
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={saving}
+          onClick={onCancel}
+        >
+          Cancelar
+        </Button>
+      </div>
+    </form>
   );
 }

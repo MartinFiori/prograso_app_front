@@ -90,7 +90,8 @@ describe("UsersList", () => {
     expect(await screen.findByText("Ana Gomez")).toBeInTheDocument();
     expect(screen.getByText(/Página 1 de 1 \(1 usuarios\)/)).toBeInTheDocument();
 
-    await userEvent.type(screen.getByLabelText("Email"), "nueva@example.com");
+    await userEvent.click(screen.getByRole("button", { name: "+ Crear usuario" }));
+    await userEvent.type(screen.getByLabelText(/Email/), "nueva@example.com");
     await userEvent.click(screen.getByRole("button", { name: "Invitar" }));
 
     await waitFor(() => {
@@ -99,6 +100,61 @@ describe("UsersList", () => {
       );
       expect(inviteCall).toBeDefined();
       expect(String(inviteCall?.[0])).toContain("/admin/users/invitations");
+    });
+  });
+
+  test("can change the user role from Administrar", async () => {
+    const userId = usersBody.data[0].id;
+
+    (global.fetch as jest.Mock).mockImplementation((url: string, options?: RequestInit) => {
+      if (options?.method === "PATCH" && String(url).includes("/role")) {
+        return jsonResponse({
+          status: "success",
+          statusCode: 200,
+          description: "OK",
+          data: { ...usersBody.data[0], role: "admin" },
+        });
+      }
+
+      if (String(url).includes(`/admin/users/${userId}`)) {
+        return jsonResponse({
+          status: "success",
+          statusCode: 200,
+          description: "OK",
+          data: usersBody.data[0],
+        });
+      }
+
+      if (String(url).includes("/admin/users")) {
+        return jsonResponse(usersBody);
+      }
+
+      return jsonResponse({ status: "error" }, 404);
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/admin/usuarios"]}>
+        <Routes>
+          <Route
+            path="/admin/usuarios"
+            element={<UsersList />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Ana Gomez")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Administrar" }));
+    const roleSelect = await screen.findByLabelText("Rol");
+    await userEvent.selectOptions(roleSelect, "admin");
+    await userEvent.click(screen.getByRole("button", { name: "Cambiar rol" }));
+
+    await waitFor(() => {
+      const roleCall = (global.fetch as jest.Mock).mock.calls.find(
+        (call) => call[1]?.method === "PATCH" && String(call[0]).includes("/role"),
+      );
+      expect(roleCall).toBeDefined();
+      expect(roleCall?.[1]?.body).toBe(JSON.stringify({ role: "admin" }));
     });
   });
 });

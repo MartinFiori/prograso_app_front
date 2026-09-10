@@ -16,6 +16,7 @@ import {
   listAdminEventsPath,
   listAdminRegistrationsPath,
   parseEventIdParam,
+  createAdminRegistrationPath,
   syncAdminRegistrationsPath,
   updateAdminRegistrationPath,
 } from "../services/eventsApi";
@@ -40,6 +41,7 @@ type ListState =
       registrations: AdminRegistration[];
       pagination: ApiPagination | null;
       meta: RegistrationListMeta | null;
+      refreshing?: boolean;
     }
   | { status: "error"; message: string };
 
@@ -131,6 +133,7 @@ function uniqueIds(ids: string[]): string[] {
 export function useAdminRegistrations(eventId: number | null) {
   const connection = useConnection();
   const [page, setPage] = useState(1);
+  const [tableLimit, setTableLimit] = useState(ADMIN_REGISTRATIONS_TABLE_LIMIT);
   const [desiredUserIds, setDesiredUserIds] = useState<string[]>([]);
   const [roster, setRoster] = useState<AdminRegistration[]>([]);
   const [state, setState] = useState<ListState>({ status: "loading" });
@@ -148,7 +151,11 @@ export function useAdminRegistrations(eventId: number | null) {
       return;
     }
 
-    setState({ status: "loading" });
+    setState((current) =>
+      current.status === "success"
+        ? { ...current, refreshing: true }
+        : { status: "loading" },
+    );
 
     const collected: AdminRegistration[] = [];
     let meta: RegistrationListMeta | null = null;
@@ -189,7 +196,7 @@ export function useAdminRegistrations(eventId: number | null) {
     setPage(1);
     setState({
       status: "success",
-      registrations: collected.slice(0, ADMIN_REGISTRATIONS_TABLE_LIMIT),
+      registrations: collected,
       pagination: {
         page: 1,
         limit: ADMIN_REGISTRATIONS_TABLE_LIMIT,
@@ -210,12 +217,12 @@ export function useAdminRegistrations(eventId: number | null) {
   const totalVisible = visibleRegistrations.length;
   const totalPages = Math.max(
     1,
-    Math.ceil(totalVisible / ADMIN_REGISTRATIONS_TABLE_LIMIT) || 1,
+    Math.ceil(totalVisible / tableLimit) || 1,
   );
   const safePage = Math.min(page, totalPages);
   const pageRows = visibleRegistrations.slice(
-    (safePage - 1) * ADMIN_REGISTRATIONS_TABLE_LIMIT,
-    safePage * ADMIN_REGISTRATIONS_TABLE_LIMIT,
+    (safePage - 1) * tableLimit,
+    safePage * tableLimit,
   );
 
   const listState: ListState =
@@ -225,7 +232,7 @@ export function useAdminRegistrations(eventId: number | null) {
           registrations: pageRows,
           pagination: {
             page: safePage,
-            limit: ADMIN_REGISTRATIONS_TABLE_LIMIT,
+            limit: tableLimit,
             total: totalVisible,
             total_pages: totalVisible === 0 ? 0 : totalPages,
           },
@@ -299,14 +306,39 @@ export function useAdminRegistrations(eventId: number | null) {
     [connection, load],
   );
 
+  const create = useCallback(
+    async (userId: string): Promise<string | null> => {
+      if (eventId === null) {
+        return "Elegí un evento.";
+      }
+
+      const result = await connection<ApiResponse<AdminRegistration>>({
+        method: "POST",
+        url: createAdminRegistrationPath(eventId),
+        body: { user_id: userId },
+      });
+
+      if (isConnectionError(result)) {
+        return formatConnectionError(result);
+      }
+
+      await load();
+      return null;
+    },
+    [connection, eventId, load],
+  );
+
   return {
     state: listState,
     page: safePage,
     setPage,
+    tableLimit,
+    setTableLimit,
     reload: load,
     desiredUserIds,
     addDesired,
     removeDesired,
+    create,
     sync,
     update,
   };

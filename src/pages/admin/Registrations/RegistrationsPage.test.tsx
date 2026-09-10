@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -300,5 +300,71 @@ describe("RegistrationsPage", () => {
     expect(putBody?.user_ids).toHaveLength(120);
     expect(putBody?.user_ids).toContain("11111111-1111-4111-8111-000000000021");
     expect(putBody?.user_ids).toContain("11111111-1111-4111-8111-000000000120");
+  });
+
+  test("creates a registration with POST user_id", async () => {
+    (global.fetch as jest.Mock).mockImplementation((url: string, init?: RequestInit) => {
+      const href = String(url);
+
+      if (href.includes("/registration-statuses")) {
+        return jsonResponse({
+          status: "success",
+          statusCode: 200,
+          description: "OK",
+          data: [{ code: "confirmed", label: "Confirmada", description: null }],
+        });
+      }
+
+      if (href.includes("/admin/events/4/registrations") && init?.method === "POST") {
+        return jsonResponse(
+          {
+            status: "success",
+            statusCode: 201,
+            description: "OK",
+            data: registrationsBody.data[0],
+          },
+          201,
+        );
+      }
+
+      if (href.includes("/admin/events/4/registrations")) {
+        return jsonResponse(registrationsBody);
+      }
+
+      if (href.includes("/admin/events")) {
+        return jsonResponse(eventsBody);
+      }
+
+      return jsonResponse({ status: "error" }, 404);
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/admin/inscripciones/4"]}>
+        <Routes>
+          <Route
+            path="/admin/inscripciones/:eventId"
+            element={<RegistrationsPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Ana Gomez")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "+ Crear inscripción" }));
+    fireEvent.change(screen.getByLabelText(/user_id/), {
+      target: { value: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" },
+    });
+    await userEvent.click(screen.getByRole("button", { name: "Crear" }));
+
+    await waitFor(() => {
+      const createCall = (global.fetch as jest.Mock).mock.calls.find(
+        (call) => call[1]?.method === "POST",
+      );
+      expect(createCall).toBeDefined();
+      expect(String(createCall?.[0])).toContain("/admin/events/4/registrations");
+      expect(createCall?.[1]?.body).toBe(
+        JSON.stringify({ user_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }),
+      );
+    });
   });
 });

@@ -15,6 +15,7 @@ type ListState =
       status: "success";
       logs: AuditLog[];
       pagination: ApiPagination | null;
+      refreshing?: boolean;
     }
   | { status: "error"; message: string };
 
@@ -27,7 +28,11 @@ export function useAdminAuditLogs(query: ListAuditLogsQuery) {
   const action = query.action ?? "";
 
   const load = useCallback(async () => {
-    setState({ status: "loading" });
+    setState((current) =>
+      current.status === "success"
+        ? { ...current, refreshing: true }
+        : { status: "loading" },
+    );
 
     const result = await connection<ApiResponse<AuditLog[]>>({
       url: listAuditLogsPath({

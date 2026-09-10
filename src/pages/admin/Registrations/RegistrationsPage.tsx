@@ -2,6 +2,11 @@ import { FormEvent, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "../../../components/Button/Button";
+import {
+  DescriptionList,
+  emptyDisplay,
+} from "../../../components/DescriptionList/DescriptionList";
+import { Modal } from "../../../components/Modal/Modal";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
 import {
   parseEventIdParam,
@@ -14,6 +19,8 @@ import { listAdminUsersPath } from "../../../services/adminUsersApi";
 import type { ApiResponse } from "../../../types";
 import type { AdminRegistration, AdminUser } from "../../../types/admin";
 import { formatConnectionError } from "../../../utils/apiError";
+import { formatEventDateTime } from "../../../utils/eventDisplay";
+import { ResourcePager } from "../ResourcePager";
 import styles from "../adminShared.module.scss";
 
 const PICKER_LIMIT = 100;
@@ -23,6 +30,7 @@ function RegistrationRow({
   statuses,
   onSave,
   onRemoveFromSet,
+  onDetails,
 }: {
   registration: AdminRegistration;
   statuses: { code: string; label: string }[];
@@ -31,6 +39,7 @@ function RegistrationRow({
     body: { status_code?: string; waitlist_position?: number | null },
   ) => Promise<string | null>;
   onRemoveFromSet: (userId: string) => void;
+  onDetails: (registration: AdminRegistration) => void;
 }) {
   const writableStatuses = statuses.filter(
     (status) => status.code === "confirmed" || status.code === "waitlisted",
@@ -102,7 +111,14 @@ function RegistrationRow({
         />
       </td>
       <td>
-        <div className={styles.actions}>
+        <div className={styles.tableActions}>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => onDetails(registration)}
+          >
+            Ver detalles
+          </Button>
           <Button
             size="sm"
             loading={busy}
@@ -146,6 +162,12 @@ export default function RegistrationsPage() {
   const [searching, setSearching] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createUserId, setCreateUserId] = useState("");
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [detail, setDetail] = useState<AdminRegistration | null>(null);
 
   function onSelectEvent(nextId: string) {
     if (!nextId) {
@@ -186,11 +208,50 @@ export default function RegistrationsPage() {
     }
   }
 
+  async function handleCreate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!createUserId.trim()) {
+      setCreateError("El user_id es obligatorio.");
+      return;
+    }
+
+    setCreating(true);
+    setCreateError(null);
+    const error = await list.create(createUserId.trim());
+    setCreating(false);
+
+    if (error) {
+      setCreateError(error);
+      return;
+    }
+
+    setCreateOpen(false);
+    setCreateUserId("");
+    setStatusMessage("Inscripción creada.");
+  }
+
+  const loadingList = list.state.status === "loading" || options.loading;
+  const pagination =
+    list.state.status === "success" ? list.state.pagination : null;
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
         <h1>Inscripciones</h1>
+        {eventId != null ? (
+          <Button onClick={() => setCreateOpen(true)}>+ Crear inscripción</Button>
+        ) : null}
       </header>
+
+      {statusMessage ? (
+        <p
+          className={styles.status}
+          role="status"
+        >
+          {statusMessage}
+        </p>
+      ) : null}
 
       <label className={styles.field}>
         <span className={styles.label}>Evento</span>
@@ -223,8 +284,6 @@ export default function RegistrationsPage() {
 
       {eventId === null ? (
         <p className={styles.message}>Elegí un evento para ver inscripciones.</p>
-      ) : list.state.status === "loading" || options.loading ? (
-        <PadelLoader label="Cargando inscripciones..." />
       ) : list.state.status === "error" ? (
         <div
           className={styles.error}
@@ -235,20 +294,12 @@ export default function RegistrationsPage() {
         </div>
       ) : (
         <>
-          {list.state.meta ? (
+          {list.state.status === "success" && list.state.meta ? (
             <div className={styles.meta}>
               <p>Cupo: {list.state.meta.capacity}</p>
               <p>Confirmados: {list.state.meta.confirmed_count}</p>
               <p>En espera: {list.state.meta.waitlisted_count}</p>
             </div>
-          ) : null}
-
-          {list.state.pagination ? (
-            <p>
-              Página {list.state.pagination.page} de{" "}
-              {list.state.pagination.total_pages} ({list.state.pagination.total}{" "}
-              inscripciones)
-            </p>
           ) : null}
 
           <p>Conjunto deseado: {list.desiredUserIds.length} usuarios</p>
@@ -323,10 +374,17 @@ export default function RegistrationsPage() {
             </p>
           ) : null}
 
-          {list.state.registrations.length === 0 ? (
-            <p className={styles.message}>No hay inscripciones en este evento.</p>
-          ) : (
-            <div className={styles.tableWrap}>
+          <div className={styles.tableWrap}>
+            {loadingList ? (
+              <div className={styles.tableStatus}>
+                <PadelLoader label="Cargando inscripciones..." />
+              </div>
+            ) : list.state.status === "success" &&
+              list.state.registrations.length === 0 ? (
+              <p className={styles.tableStatus}>
+                No hay inscripciones en este evento.
+              </p>
+            ) : list.state.status === "success" ? (
               <table className={styles.table}>
                 <thead>
                   <tr>
@@ -345,33 +403,111 @@ export default function RegistrationsPage() {
                       statuses={statuses}
                       onSave={list.update}
                       onRemoveFromSet={list.removeDesired}
+                      onDetails={setDetail}
                     />
                   ))}
                 </tbody>
               </table>
-            </div>
-          )}
+            ) : null}
+          </div>
 
-          {list.state.pagination && list.state.pagination.total_pages > 1 ? (
-            <div className={styles.actions}>
-              <Button
-                variant="secondary"
-                disabled={list.page <= 1}
-                onClick={() => list.setPage((current) => Math.max(1, current - 1))}
-              >
-                Anterior
-              </Button>
-              <Button
-                variant="secondary"
-                disabled={list.page >= list.state.pagination.total_pages}
-                onClick={() => list.setPage((current) => current + 1)}
-              >
-                Siguiente
-              </Button>
-            </div>
+          {pagination ? (
+            <ResourcePager
+              page={list.page}
+              totalPages={pagination.total_pages}
+              total={pagination.total}
+              limit={list.tableLimit}
+              noun="inscripciones"
+              disabled={loadingList}
+              onPageChange={list.setPage}
+              onLimitChange={(next) => {
+                list.setTableLimit(next);
+                list.setPage(1);
+              }}
+            />
           ) : null}
         </>
       )}
+
+      <Modal
+        open={createOpen}
+        title="Crear inscripción"
+        onClose={() => {
+          if (!creating) {
+            setCreateOpen(false);
+            setCreateError(null);
+            setCreateUserId("");
+          }
+        }}
+        busy={creating}
+      >
+        <form
+          className={styles.form}
+          onSubmit={(formEvent) => void handleCreate(formEvent)}
+        >
+          <label className={styles.field}>
+            <span className={styles.label}>user_id *</span>
+            <input
+              className={styles.input}
+              name="user_id"
+              value={createUserId}
+              onChange={(changeEvent) => setCreateUserId(changeEvent.target.value)}
+              required
+            />
+          </label>
+          {createError ? (
+            <p
+              className={styles.error}
+              role="alert"
+            >
+              {createError}
+            </p>
+          ) : null}
+          <Button
+            type="submit"
+            loading={creating}
+          >
+            Crear
+          </Button>
+        </form>
+      </Modal>
+
+      <Modal
+        open={detail != null}
+        title={
+          detail
+            ? `Inscripción ${detail.id}`
+            : "Detalle"
+        }
+        onClose={() => setDetail(null)}
+      >
+        {detail ? (
+          <DescriptionList
+            items={[
+              { label: "Id", value: emptyDisplay(detail.id) },
+              { label: "Evento", value: emptyDisplay(detail.event_id) },
+              { label: "Usuario", value: detail.user_id },
+              {
+                label: "Nombre",
+                value: emptyDisplay(detail.profile?.name),
+              },
+              { label: "Estado", value: detail.status_code },
+              {
+                label: "Espera",
+                value: emptyDisplay(detail.waitlist_position),
+              },
+              {
+                label: "Creada",
+                value: formatEventDateTime(detail.created_at),
+              },
+              {
+                label: "Actualizada",
+                value: formatEventDateTime(detail.updated_at),
+              },
+            ]}
+          />
+        ) : null}
+      </Modal>
     </main>
   );
 }

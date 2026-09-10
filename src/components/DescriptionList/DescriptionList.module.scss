@@ -1,0 +1,32 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  gap: var(--spacing-3);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 11rem) minmax(0, 1fr);
+  gap: var(--spacing-3);
+  padding-bottom: var(--spacing-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+}
+
+.label {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.value {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+}

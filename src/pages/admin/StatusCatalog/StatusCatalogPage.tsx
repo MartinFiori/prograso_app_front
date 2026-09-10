@@ -1,6 +1,14 @@
+import { useState } from "react";
+
 import { Button } from "../../../components/Button/Button";
+import {
+  DescriptionList,
+  emptyDisplay,
+} from "../../../components/DescriptionList/DescriptionList";
+import { Modal } from "../../../components/Modal/Modal";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
 import { useStatusCatalog } from "../../../hooks/useStatusCatalog";
+import type { CatalogStatus } from "../../../types/admin";
 import styles from "../adminShared.module.scss";
 
 interface StatusCatalogPageProps {
@@ -15,28 +23,10 @@ export default function StatusCatalogPage({
   emptyMessage,
 }: StatusCatalogPageProps) {
   const { state, reload } = useStatusCatalog(path);
-
-  if (state.status === "loading") {
-    return (
-      <main className={styles.page}>
-        <PadelLoader label={`Cargando ${title.toLowerCase()}...`} />
-      </main>
-    );
-  }
-
-  if (state.status === "error") {
-    return (
-      <main className={styles.page}>
-        <div
-          className={styles.error}
-          role="alert"
-        >
-          <p>{state.message}</p>
-          <Button onClick={() => void reload()}>Reintentar</Button>
-        </div>
-      </main>
-    );
-  }
+  const [detail, setDetail] = useState<CatalogStatus | null>(null);
+  const loading = state.status === "loading";
+  const failed = state.status === "error";
+  const items = state.status === "success" ? state.items : [];
 
   return (
     <main className={styles.page}>
@@ -44,30 +34,72 @@ export default function StatusCatalogPage({
         <h1>{title}</h1>
       </header>
 
-      {state.items.length === 0 ? (
-        <p className={styles.message}>{emptyMessage}</p>
+      {failed ? (
+        <div
+          className={styles.error}
+          role="alert"
+        >
+          <p>{state.message}</p>
+          <Button onClick={() => void reload()}>Reintentar</Button>
+        </div>
       ) : (
         <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Etiqueta</th>
-                <th>Descripción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {state.items.map((item) => (
-                <tr key={item.code}>
-                  <td>{item.code}</td>
-                  <td>{item.label}</td>
-                  <td>{item.description}</td>
+          {loading ? (
+            <div className={styles.tableStatus}>
+              <PadelLoader label={`Cargando ${title.toLowerCase()}...`} />
+            </div>
+          ) : items.length === 0 ? (
+            <p className={styles.tableStatus}>{emptyMessage}</p>
+          ) : (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Etiqueta</th>
+                  <th>Descripción</th>
+                  <th>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.code}>
+                    <td>{item.code}</td>
+                    <td>{item.label}</td>
+                    <td>{emptyDisplay(item.description)}</td>
+                    <td>
+                      <div className={styles.tableActions}>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setDetail(item)}
+                        >
+                          Ver detalles
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
+
+      <Modal
+        open={detail != null}
+        title={detail?.label ?? "Detalle"}
+        onClose={() => setDetail(null)}
+      >
+        {detail ? (
+          <DescriptionList
+            items={[
+              { label: "Código", value: detail.code },
+              { label: "Etiqueta", value: detail.label },
+              { label: "Descripción", value: emptyDisplay(detail.description) },
+            ]}
+          />
+        ) : null}
+      </Modal>
     </main>
   );
 }

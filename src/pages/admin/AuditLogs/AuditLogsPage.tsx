@@ -1,10 +1,17 @@
 import { FormEvent, useState } from "react";
 
 import { Button } from "../../../components/Button/Button";
+import {
+  DescriptionList,
+  emptyDisplay,
+} from "../../../components/DescriptionList/DescriptionList";
+import { Modal } from "../../../components/Modal/Modal";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
 import { useAdminAuditLogs } from "../../../hooks/useAdminAuditLogs";
+import type { AuditLog } from "../../../types/admin";
 import { AUDIT_ACTIONS } from "../../../types/admin";
 import { formatEventDateTime } from "../../../utils/eventDisplay";
+import { ResourcePager } from "../ResourcePager";
 import styles from "../adminShared.module.scss";
 
 function stringifyJson(value: unknown): string {
@@ -13,7 +20,7 @@ function stringifyJson(value: unknown): string {
   }
 
   try {
-    return JSON.stringify(value);
+    return JSON.stringify(value, null, 2);
   } catch {
     return String(value);
   }
@@ -21,15 +28,18 @@ function stringifyJson(value: unknown): string {
 
 export default function AuditLogsPage() {
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
   const [targetUserIdInput, setTargetUserIdInput] = useState("");
   const [actionInput, setActionInput] = useState("");
   const [targetUserId, setTargetUserId] = useState("");
   const [action, setAction] = useState("");
   const { state, reload } = useAdminAuditLogs({
     page,
+    limit,
     target_user_id: targetUserId,
     action,
   });
+  const [detail, setDetail] = useState<AuditLog | null>(null);
 
   function handleFilter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,27 +48,10 @@ export default function AuditLogsPage() {
     setAction(actionInput);
   }
 
-  if (state.status === "loading") {
-    return (
-      <main className={styles.page}>
-        <PadelLoader label="Cargando auditoría..." />
-      </main>
-    );
-  }
-
-  if (state.status === "error") {
-    return (
-      <main className={styles.page}>
-        <div
-          className={styles.error}
-          role="alert"
-        >
-          <p>{state.message}</p>
-          <Button onClick={() => void reload()}>Reintentar</Button>
-        </div>
-      </main>
-    );
-  }
+  const loading = state.status === "loading";
+  const failed = state.status === "error";
+  const logs = state.status === "success" ? state.logs : [];
+  const pagination = state.status === "success" ? state.pagination : null;
 
   return (
     <main className={styles.page}>
@@ -104,64 +97,115 @@ export default function AuditLogsPage() {
         <Button type="submit">Filtrar</Button>
       </form>
 
-      {state.pagination ? (
-        <p>
-          Página {state.pagination.page} de {state.pagination.total_pages} (
-          {state.pagination.total} registros)
-        </p>
-      ) : null}
-
-      {state.logs.length === 0 ? (
-        <p className={styles.message}>No hay registros de auditoría.</p>
-      ) : (
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Acción</th>
-                <th>Actor</th>
-                <th>Objetivo</th>
-                <th>Razón</th>
-                <th>Antes</th>
-                <th>Después</th>
-              </tr>
-            </thead>
-            <tbody>
-              {state.logs.map((log) => (
-                <tr key={log.id}>
-                  <td>{formatEventDateTime(log.created_at)}</td>
-                  <td>{log.action}</td>
-                  <td>{log.actor_user_id}</td>
-                  <td>{log.target_user_id}</td>
-                  <td>{log.reason}</td>
-                  <td>{stringifyJson(log.previous_values)}</td>
-                  <td>{stringifyJson(log.new_values)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {failed ? (
+        <div
+          className={styles.error}
+          role="alert"
+        >
+          <p>{state.message}</p>
+          <Button onClick={() => void reload()}>Reintentar</Button>
         </div>
+      ) : (
+        <>
+          <div className={styles.tableWrap}>
+            {loading ? (
+              <div className={styles.tableStatus}>
+                <PadelLoader label="Cargando auditoría..." />
+              </div>
+            ) : logs.length === 0 ? (
+              <p className={styles.tableStatus}>No hay registros de auditoría.</p>
+            ) : (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Acción</th>
+                    <th>Actor</th>
+                    <th>Objetivo</th>
+                    <th>Razón</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.map((log) => (
+                    <tr key={log.id}>
+                      <td>{formatEventDateTime(log.created_at)}</td>
+                      <td>{log.action}</td>
+                      <td>{emptyDisplay(log.actor_user_id)}</td>
+                      <td>{emptyDisplay(log.target_user_id)}</td>
+                      <td>{emptyDisplay(log.reason)}</td>
+                      <td>
+                        <div className={styles.tableActions}>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => setDetail(log)}
+                          >
+                            Ver detalles
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+          {pagination ? (
+            <ResourcePager
+              page={pagination.page}
+              totalPages={pagination.total_pages}
+              total={pagination.total}
+              limit={limit}
+              noun="registros"
+              disabled={loading}
+              onPageChange={setPage}
+              onLimitChange={(next) => {
+                setLimit(next);
+                setPage(1);
+              }}
+            />
+          ) : null}
+        </>
       )}
 
-      {state.pagination && state.pagination.total_pages > 1 ? (
-        <div className={styles.actions}>
-          <Button
-            variant="secondary"
-            disabled={page <= 1}
-            onClick={() => setPage((current) => Math.max(1, current - 1))}
-          >
-            Anterior
-          </Button>
-          <Button
-            variant="secondary"
-            disabled={page >= state.pagination.total_pages}
-            onClick={() => setPage((current) => current + 1)}
-          >
-            Siguiente
-          </Button>
-        </div>
-      ) : null}
+      <Modal
+        open={detail != null}
+        title={detail ? `Auditoría ${detail.id}` : "Detalle"}
+        onClose={() => setDetail(null)}
+      >
+        {detail ? (
+          <DescriptionList
+            items={[
+              { label: "Id", value: emptyDisplay(detail.id) },
+              { label: "Acción", value: detail.action },
+              {
+                label: "Fecha",
+                value: formatEventDateTime(detail.created_at),
+              },
+              { label: "Actor", value: emptyDisplay(detail.actor_user_id) },
+              { label: "Objetivo", value: emptyDisplay(detail.target_user_id) },
+              { label: "Razón", value: emptyDisplay(detail.reason) },
+              {
+                label: "Antes",
+                value: (
+                  <pre className={styles.json}>
+                    {emptyDisplay(stringifyJson(detail.previous_values))}
+                  </pre>
+                ),
+              },
+              {
+                label: "Después",
+                value: (
+                  <pre className={styles.json}>
+                    {emptyDisplay(stringifyJson(detail.new_values))}
+                  </pre>
+                ),
+              },
+            ]}
+          />
+        ) : null}
+      </Modal>
     </main>
   );
 }

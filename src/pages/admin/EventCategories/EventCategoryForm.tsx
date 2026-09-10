@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "../../../components/Button/Button";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
@@ -12,12 +11,22 @@ import styles from "./EventCategoryForm.module.scss";
 
 interface EventCategoryFormProps {
   mode: "create" | "edit";
+  categoryId?: number;
+  onSaved: () => void;
+  onCancel: () => void;
+  onBusyChange?: (busy: boolean) => void;
 }
 
-export default function EventCategoryForm({ mode }: EventCategoryFormProps) {
-  const navigate = useNavigate();
-  const { id: rawId } = useParams();
-  const detail = useAdminCategoryDetail(mode === "edit" ? rawId : undefined);
+export default function EventCategoryForm({
+  mode,
+  categoryId,
+  onSaved,
+  onCancel,
+  onBusyChange,
+}: EventCategoryFormProps) {
+  const detail = useAdminCategoryDetail(
+    mode === "edit" && categoryId != null ? String(categoryId) : undefined,
+  );
   const { create, update } = useAdminCategoryMutations();
 
   const [name, setName] = useState("");
@@ -26,6 +35,7 @@ export default function EventCategoryForm({ mode }: EventCategoryFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -74,7 +84,7 @@ export default function EventCategoryForm({ mode }: EventCategoryFormProps) {
     const trimmedName = name.trim();
 
     if (!trimmedName) {
-      setError("El nombre es obligatorio.");
+      setFieldError("El nombre es obligatorio.");
       return;
     }
 
@@ -90,7 +100,9 @@ export default function EventCategoryForm({ mode }: EventCategoryFormProps) {
     }
 
     setSaving(true);
+    onBusyChange?.(true);
     setError(null);
+    setFieldError(null);
 
     const result =
       mode === "create"
@@ -100,44 +112,31 @@ export default function EventCategoryForm({ mode }: EventCategoryFormProps) {
           : await update(detail.id, form);
 
     setSaving(false);
+    onBusyChange?.(false);
 
     if ("error" in result && result.error) {
       setError(result.error);
       return;
     }
 
-    navigate("/admin/categorias");
+    onSaved();
   }
 
   if (mode === "edit" && detail.state.status === "loading") {
-    return (
-      <main className={styles.page}>
-        <PadelLoader label="Cargando categoría..." />
-      </main>
-    );
+    return <PadelLoader label="Cargando categoría..." />;
   }
 
   if (mode === "edit" && detail.state.status === "invalid-id") {
-    return (
-      <main className={styles.page}>
-        <h1>Categoría no válida</h1>
-        <Link to="/admin/categorias">Volver</Link>
-      </main>
-    );
+    return <p className={styles.error}>Categoría no válida</p>;
   }
 
   if (mode === "edit" && detail.state.status === "not-found") {
-    return (
-      <main className={styles.page}>
-        <h1>Categoría no encontrada</h1>
-        <Link to="/admin/categorias">Volver</Link>
-      </main>
-    );
+    return <p className={styles.error}>Categoría no encontrada</p>;
   }
 
   if (mode === "edit" && detail.state.status === "error") {
     return (
-      <main className={styles.page}>
+      <div>
         <p
           className={styles.error}
           role="alert"
@@ -145,88 +144,95 @@ export default function EventCategoryForm({ mode }: EventCategoryFormProps) {
           {detail.state.message}
         </p>
         <Button onClick={() => void detail.reload()}>Reintentar</Button>
-      </main>
+      </div>
     );
   }
 
   const preview = previewUrl ?? existingImageUrl;
 
   return (
-    <main className={styles.page}>
-      <h1>{mode === "create" ? "Nueva categoría" : "Editar categoría"}</h1>
-
-      <form
-        className={styles.form}
-        onSubmit={(event) => void handleSubmit(event)}
-      >
-        <label className={styles.field}>
-          <span className={styles.label}>Nombre</span>
-          <input
-            className={styles.input}
-            name="name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-          />
-        </label>
-
-        <label className={styles.field}>
-          <span className={styles.label}>Descripción</span>
-          <textarea
-            className={styles.textarea}
-            name="description"
-            rows={4}
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </label>
-
-        <label className={styles.field}>
-          <span className={styles.label}>Imagen</span>
-          <input
-            className={styles.input}
-            type="file"
-            name="image"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
-          />
-        </label>
-
-        {preview ? (
-          <img
-            className={styles.preview}
-            src={preview}
-            alt={name || "Vista previa"}
-          />
-        ) : null}
-
-        {error ? (
-          <p
+    <form
+      className={styles.form}
+      onSubmit={(submitEvent) => void handleSubmit(submitEvent)}
+    >
+      <label className={styles.field}>
+        <span className={styles.label}>Nombre *</span>
+        <input
+          className={styles.input}
+          name="name"
+          value={name}
+          onChange={(changeEvent) => setName(changeEvent.target.value)}
+          required
+          aria-invalid={fieldError ? true : undefined}
+        />
+        {fieldError ? (
+          <span
             className={styles.error}
             role="alert"
           >
-            {error}
-          </p>
+            {fieldError}
+          </span>
         ) : null}
+      </label>
 
-        <div className={styles.actions}>
-          <Button
-            type="submit"
-            loading={saving}
-            loadingText="Guardando..."
-          >
-            Guardar
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={saving}
-            onClick={() => navigate("/admin/categorias")}
-          >
-            Cancelar
-          </Button>
-        </div>
-      </form>
-    </main>
+      <label className={styles.field}>
+        <span className={styles.label}>Descripción</span>
+        <textarea
+          className={styles.textarea}
+          name="description"
+          rows={4}
+          value={description}
+          onChange={(changeEvent) => setDescription(changeEvent.target.value)}
+        />
+      </label>
+
+      <label className={styles.field}>
+        <span className={styles.label}>Imagen</span>
+        <input
+          className={styles.input}
+          type="file"
+          name="image"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          onChange={(changeEvent) =>
+            onFileChange(changeEvent.target.files?.[0] ?? null)
+          }
+        />
+      </label>
+
+      {preview ? (
+        <img
+          className={styles.preview}
+          src={preview}
+          alt={name || "Vista previa"}
+        />
+      ) : null}
+
+      {error ? (
+        <p
+          className={styles.error}
+          role="alert"
+        >
+          {error}
+        </p>
+      ) : null}
+
+      <div className={styles.actions}>
+        <Button
+          type="submit"
+          loading={saving}
+          loadingText="Guardando..."
+        >
+          Guardar
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={saving}
+          onClick={onCancel}
+        >
+          Cancelar
+        </Button>
+      </div>
+    </form>
   );
 }

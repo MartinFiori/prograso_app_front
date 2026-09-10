@@ -133,6 +133,55 @@
   tr:last-child td {
     border-bottom: 0;
   }
+
+  th:last-child,
+  td:last-child {
+    text-align: right;
+  }
+}
+
+.thumb {
+  width: 2.75rem;
+  height: 2.75rem;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-background-secondary);
+}
+
+.tableActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+}
+
+.tableStatus {
+  display: flex;
+  min-height: 8rem;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-6);
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+}
+
+.status {
+  color: var(--color-text-secondary);
+}
+
+.json {
+  margin: 0;
+  overflow-x: auto;
+  font-family: ui-monospace, monospace;
+  font-size: var(--font-size-sm);
+  white-space: pre-wrap;
 }
 
 .meta {

@@ -18,22 +18,11 @@ const LegacyEventRedirect = lazy(
 const EventCategoriesList = lazy(
   () => import("../pages/admin/EventCategories/EventCategoriesList"),
 );
-const EventCategoryCreatePage = lazy(
-  () => import("../pages/admin/EventCategories/EventCategoryCreatePage"),
-);
-const EventCategoryEditPage = lazy(
-  () => import("../pages/admin/EventCategories/EventCategoryEditPage"),
-);
 const EventsList = lazy(() => import("../pages/admin/Events/EventsList"));
-const EventCreatePage = lazy(
-  () => import("../pages/admin/Events/EventCreatePage"),
-);
-const EventEditPage = lazy(() => import("../pages/admin/Events/EventEditPage"));
 const RegistrationsPage = lazy(
   () => import("../pages/admin/Registrations/RegistrationsPage"),
 );
 const UsersList = lazy(() => import("../pages/admin/Users/UsersList"));
-const UserDetailPage = lazy(() => import("../pages/admin/Users/UserDetailPage"));
 const EventStatusesPage = lazy(
   () => import("../pages/admin/EventStatuses/EventStatusesPage"),
 );
@@ -113,11 +102,21 @@ export default function RoutesPage() {
             />
             <Route
               path="categorias/nueva"
-              element={<EventCategoryCreatePage />}
+              element={
+                <Navigate
+                  to="/admin/categorias"
+                  replace
+                />
+              }
             />
             <Route
               path="categorias/:id/editar"
-              element={<EventCategoryEditPage />}
+              element={
+                <Navigate
+                  to="/admin/categorias"
+                  replace
+                />
+              }
             />
             <Route
               path="eventos"
@@ -125,11 +124,21 @@ export default function RoutesPage() {
             />
             <Route
               path="eventos/nuevo"
-              element={<EventCreatePage />}
+              element={
+                <Navigate
+                  to="/admin/eventos"
+                  replace
+                />
+              }
             />
             <Route
               path="eventos/:id/editar"
-              element={<EventEditPage />}
+              element={
+                <Navigate
+                  to="/admin/eventos"
+                  replace
+                />
+              }
             />
             <Route
               path="inscripciones"
@@ -145,7 +154,12 @@ export default function RoutesPage() {
             />
             <Route
               path="usuarios/:userId"
-              element={<UserDetailPage />}
+              element={
+                <Navigate
+                  to="/admin/usuarios"
+                  replace
+                />
+              }
             />
             <Route
               path="estados-evento"

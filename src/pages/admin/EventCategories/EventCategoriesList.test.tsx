@@ -91,7 +91,12 @@ describe("EventCategoriesList", () => {
       await screen.findByRole("heading", { name: "Categorías" }),
     ).toBeInTheDocument();
     expect(await screen.findByText("Encuentro abierto")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Nueva categoría" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "+ Crear categoría" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Nombre" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Nueva categoría" })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Ver detalles" }));
+    expect(await screen.findByRole("dialog", { name: "Encuentro abierto" })).toBeInTheDocument();
   });
 
   test("sends DELETE without JSON content-type", async () => {

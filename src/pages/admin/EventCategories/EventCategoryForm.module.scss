@@ -1,19 +1,10 @@
 @use "../../../scss/mixins" as *;
 
-.page {
-  @include container;
-
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-  padding-block: var(--spacing-8);
-}
-
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-5);
-  max-width: 32rem;
+  max-width: none;
 }
 
 .field {

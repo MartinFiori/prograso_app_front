@@ -37,5 +37,6 @@ describe("EventStatusesPage", () => {
       await screen.findByText("No hay estados de evento."),
     ).toBeInTheDocument();
     expect(screen.queryByText(/404/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /\+ Crear/ })).not.toBeInTheDocument();
   });
 });

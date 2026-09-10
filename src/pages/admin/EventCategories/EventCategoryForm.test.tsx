@@ -1,8 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
 
-import EventCategoryCreatePage from "./EventCategoryCreatePage";
+import EventCategoryForm from "./EventCategoryForm";
 import { supabase } from "../../../utils/supabase";
 
 jest.mock("../../../utils/supabase", () => ({
@@ -56,24 +55,18 @@ describe("EventCategoryForm create", () => {
   });
 
   test("submits multipart FormData with the image field", async () => {
+    const onSaved = jest.fn();
     (global.fetch as jest.Mock).mockResolvedValue(jsonResponse(createdBody, 201));
 
     render(
-      <MemoryRouter initialEntries={["/admin/categorias/nueva"]}>
-        <Routes>
-          <Route
-            path="/admin/categorias/nueva"
-            element={<EventCategoryCreatePage />}
-          />
-          <Route
-            path="/admin/categorias"
-            element={<p>listado</p>}
-          />
-        </Routes>
-      </MemoryRouter>,
+      <EventCategoryForm
+        mode="create"
+        onSaved={onSaved}
+        onCancel={jest.fn()}
+      />,
     );
 
-    await userEvent.type(screen.getByLabelText("Nombre"), "Cancha abierta");
+    await userEvent.type(screen.getByLabelText(/Nombre/), "Cancha abierta");
     await userEvent.type(
       screen.getByLabelText("Descripción"),
       "Eventos de cancha abierta",
@@ -100,5 +93,6 @@ describe("EventCategoryForm create", () => {
     expect(form.get("image")).toBeInstanceOf(File);
     const headers = new Headers(options.headers);
     expect(headers.get("Content-Type")).not.toBe("application/json");
+    expect(onSaved).toHaveBeenCalled();
   });
 });

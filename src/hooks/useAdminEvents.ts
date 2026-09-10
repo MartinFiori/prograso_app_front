@@ -31,6 +31,7 @@ type ListState =
       status: "success";
       events: AdminEvent[];
       pagination: ApiPagination | null;
+      refreshing?: boolean;
     }
   | { status: "error"; message: string };
 
@@ -45,15 +46,21 @@ export function useAdminEventList(query: ListEventsQuery = {}) {
   const connection = useConnection();
   const [state, setState] = useState<ListState>({ status: "loading" });
   const page = query.page ?? 1;
+  const limit = query.limit;
   const statusCode = query.status_code;
   const categoryId = query.category_id;
 
   const load = useCallback(async () => {
-    setState({ status: "loading" });
+    setState((current) =>
+      current.status === "success"
+        ? { ...current, refreshing: true }
+        : { status: "loading" },
+    );
 
     const result = await connection<ApiResponse<AdminEvent[]>>({
       url: listAdminEventsPath({
         page,
+        limit,
         status_code: statusCode,
         category_id: categoryId,
       }),
@@ -69,7 +76,7 @@ export function useAdminEventList(query: ListEventsQuery = {}) {
       events: result.data ?? [],
       pagination: result.pagination ?? null,
     });
-  }, [categoryId, connection, page, statusCode]);
+  }, [categoryId, connection, limit, page, statusCode]);
 
   useEffect(() => {
     void load();

@@ -10,7 +10,7 @@ import { formatConnectionError } from "../utils/apiError";
 
 type CatalogState =
   | { status: "loading" }
-  | { status: "success"; items: CatalogStatus[] }
+  | { status: "success"; items: CatalogStatus[]; refreshing?: boolean }
   | { status: "error"; message: string };
 
 export function useStatusCatalog(path: string) {
@@ -18,7 +18,11 @@ export function useStatusCatalog(path: string) {
   const [state, setState] = useState<CatalogState>({ status: "loading" });
 
   const load = useCallback(async () => {
-    setState({ status: "loading" });
+    setState((current) =>
+      current.status === "success"
+        ? { ...current, refreshing: true }
+        : { status: "loading" },
+    );
 
     const result = await connection<ApiResponse<CatalogStatus[]>>({
       url: path,

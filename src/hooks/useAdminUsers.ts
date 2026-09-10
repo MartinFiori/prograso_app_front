@@ -31,6 +31,7 @@ type ListState =
       status: "success";
       users: AdminUser[];
       pagination: ApiPagination | null;
+      refreshing?: boolean;
     }
   | { status: "error"; message: string };
 
@@ -45,13 +46,19 @@ export function useAdminUserList(query: ListAdminUsersQuery) {
   const connection = useConnection();
   const [state, setState] = useState<ListState>({ status: "loading" });
   const page = query.page ?? 1;
+  const limit = query.limit;
   const q = query.q ?? "";
+  const sort = query.sort;
 
   const load = useCallback(async () => {
-    setState({ status: "loading" });
+    setState((current) =>
+      current.status === "success"
+        ? { ...current, refreshing: true }
+        : { status: "loading" },
+    );
 
     const result = await connection<ApiResponse<AdminUser[]>>({
-      url: listAdminUsersPath({ page, q }),
+      url: listAdminUsersPath({ page, limit, q, sort }),
     });
 
     if (isConnectionError(result)) {
@@ -64,7 +71,7 @@ export function useAdminUserList(query: ListAdminUsersQuery) {
       users: result.data ?? [],
       pagination: result.pagination ?? null,
     });
-  }, [connection, page, q]);
+  }, [connection, limit, page, q, sort]);
 
   useEffect(() => {
     void load();

@@ -81,5 +81,7 @@ describe("EventsList", () => {
     expect(await screen.findByRole("heading", { name: "Eventos" })).toBeInTheDocument();
     expect(await screen.findByText("Borrador interno")).toBeInTheDocument();
     expect(screen.getByText("draft")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "+ Crear evento" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Título" })).toBeInTheDocument();
   });
 });

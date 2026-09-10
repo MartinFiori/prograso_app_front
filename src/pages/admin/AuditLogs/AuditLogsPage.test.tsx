@@ -59,7 +59,7 @@ describe("AuditLogsPage", () => {
     render(<AuditLogsPage />);
 
     expect(await screen.findByRole("heading", { name: "Auditoría" })).toBeInTheDocument();
-    expect(screen.getAllByText("user_invited").length).toBeGreaterThan(0);
+    expect(await screen.findByText("user_invited")).toBeInTheDocument();
     expect(screen.getByText(/Página 1 de 1 \(1 registros\)/)).toBeInTheDocument();
   });
 });

@@ -19,7 +19,7 @@ export { parseEventIdParam as parseCategoryIdParam };
 
 type ListState =
   | { status: "loading" }
-  | { status: "success"; categories: EventCategory[] }
+  | { status: "success"; categories: EventCategory[]; refreshing?: boolean }
   | { status: "error"; message: string };
 
 type DetailState =
@@ -38,7 +38,11 @@ export function useAdminCategoryList() {
   const [state, setState] = useState<ListState>({ status: "loading" });
 
   const load = useCallback(async () => {
-    setState({ status: "loading" });
+    setState((current) =>
+      current.status === "success"
+        ? { ...current, refreshing: true }
+        : { status: "loading" },
+    );
 
     const result = await connection<ApiResponse<EventCategory[]>>({
       url: listCategoriesPath(),

@@ -121,7 +121,7 @@ describe("RoutesPage public redirects", () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByRole("button", { name: "Nuevo evento" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "+ Crear evento" })).toBeInTheDocument();
     expect(await screen.findByText("Borrador interno")).toBeInTheDocument();
   });
 });
