@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 
 import { supabase } from "../../utils/supabase";
 
-const AUTH_CALLBACK_TIMEOUT_MS = 10000;
+const AUTH_CALLBACK_TIMEOUT_MS = 5000;
 
 function getCallbackError(): string | null {
   const search = new URLSearchParams(window.location.search);
   const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  console.log({search, hash})
 
   return (
     search.get("error_description") ||
