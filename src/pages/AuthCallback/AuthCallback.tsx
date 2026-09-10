@@ -1,21 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { supabase } from "../../utils/supabase";
+import { Button } from "../../components/Button/Button";
+import { PadelLoader } from "../../components/PadelLoader/PadelLoader";
+import { useSecurity } from "../../context/SecurityContext";
+import { authLog } from "../../utils/authLog";
+import styles from "./AuthCallback.module.scss";
 
-const AUTH_CALLBACK_TIMEOUT_MS = 5000;
-const API_URL = process.env.REACT_APP_API_URL || "/";
-
-function redirectToApi(search?: string): void {
-  const target = new URL(API_URL, window.location.origin);
-
-  if (search) {
-    new URLSearchParams(search).forEach((value, key) => {
-      target.searchParams.set(key, value);
-    });
-  }
-
-  window.location.replace(target.toString());
-}
+const AUTH_CALLBACK_TIMEOUT_MS = 8000;
 
 function getCallbackError(): string | null {
   const search = new URLSearchParams(window.location.search);
@@ -29,76 +21,99 @@ function getCallbackError(): string | null {
   );
 }
 
+function hasOAuthCode(): boolean {
+  const search = new URLSearchParams(window.location.search);
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+
+  return search.has("code") || hash.has("code");
+}
+
 export default function AuthCallback() {
+  const { isAuthenticated, loading } = useSecurity();
+  const navigate = useNavigate();
+  const [status, setStatus] = useState<"processing" | "error">("processing");
+  const [errorMessage, setErrorMessage] = useState(
+    "No pudimos completar el inicio de sesión. Probá de nuevo.",
+  );
+
   useEffect(() => {
-    let cancelled = false;
-
-    const goHome = () => {
-      if (!cancelled) {
-        redirectToApi();
-      }
-    };
-
-    const goError = (reason?: unknown) => {
-      if (reason) {
-        console.error("Error procesando el login:", reason);
-      }
-
-      if (!cancelled) {
-        redirectToApi("authError=true");
-      }
-    };
-
     const urlError = getCallbackError();
+    const hasCode = hasOAuthCode();
+
+    authLog("callback mounted", {
+      hasCode,
+      hasUrlError: Boolean(urlError),
+    });
 
     if (urlError) {
-      goError(urlError);
+      setStatus("error");
+      setErrorMessage(
+        "Google o Supabase no pudieron completar el acceso. Probá de nuevo.",
+      );
+      authLog("callback url error");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (status === "error") {
       return;
     }
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log({event, session})
-      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-        goHome();
-      }
-    });
+    if (!isAuthenticated) {
+      return;
+    }
 
-    void supabase.auth.getSession().then(({ data, error }) => {
-      console.log({data, error})
-      if (cancelled) {
-        return;
-      }
+    authLog("callback success, navigate /");
+    navigate("/", { replace: true });
+  }, [isAuthenticated, navigate, status]);
 
-      if (error) {
-        goError(error);
-        return;
-      }
-
-      if (data.session) {
-        goHome();
-      }
-    });
+  useEffect(() => {
+    if (status === "error" || isAuthenticated) {
+      return;
+    }
 
     const timeoutId = window.setTimeout(() => {
-      void supabase.auth.getSession().then(({ data, error }) => {
-        console.log({data, error})
-        if (error || !data.session) {
-          goError(error ?? "Tiempo de espera agotado al completar el login");
-          return;
-        }
+      if (isAuthenticated) {
+        return;
+      }
 
-        goHome();
-      });
+      setStatus("error");
+      setErrorMessage(
+        "Se agotó el tiempo para completar el inicio de sesión. Probá de nuevo.",
+      );
+      authLog("callback timeout", { loading });
     }, AUTH_CALLBACK_TIMEOUT_MS);
 
     return () => {
-      cancelled = true;
       window.clearTimeout(timeoutId);
-      subscription.unsubscribe();
     };
-  }, []);
+  }, [isAuthenticated, loading, status]);
 
-  return <p>Iniciando sesión...</p>;
+  if (status === "error") {
+    return (
+      <main className={styles.page}>
+        <div
+          className={styles.error}
+          role="alert"
+        >
+          <h1>No pudimos iniciar sesión</h1>
+          <p>{errorMessage}</p>
+          <Button
+            onClick={() => {
+              authLog("callback go home after error");
+              navigate("/", { replace: true });
+            }}
+          >
+            Volver al inicio
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className={styles.page}>
+      <PadelLoader label="Iniciando sesión..." />
+    </main>
+  );
 }

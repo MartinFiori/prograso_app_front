@@ -6,10 +6,12 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { Dispatch, ReactNode, SetStateAction } from "react";
+import type { ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
 
 import { supabase } from "../utils/supabase";
+import { getAuthRedirectTo } from "../utils/appUrl";
+import { authLog } from "../utils/authLog";
 import {
   isConnectionError,
   useConnection,
@@ -28,7 +30,6 @@ export type SecurityContextType = {
   login: () => Promise<void>;
   logout: () => Promise<void>;
   loadSession: () => Promise<void>;
-  setUser: Dispatch<SetStateAction<User | null>>;
 };
 
 type SecurityProviderProps = {
@@ -45,8 +46,6 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   const connection = useConnection();
 
   const loadSession = useCallback(async () => {
-    setLoading(true);
-
     try {
       const {
         data: { session },
@@ -58,8 +57,11 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
       }
 
       setUser(session?.user ?? null);
+      authLog("getSession", { hasUser: Boolean(session?.user) });
     } catch (error: unknown) {
-      console.error("Error obteniendo la sesión:", error);
+      authLog("getSession error", {
+        message: error instanceof Error ? error.message : "unknown",
+      });
       setUser(null);
     } finally {
       setLoading(false);
@@ -67,7 +69,8 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   }, []);
 
   const login = useCallback(async () => {
-    const redirectTo = `${window.location.origin}/auth/callback`;
+    const redirectTo = getAuthRedirectTo();
+    authLog("login start", { redirectTo });
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -77,12 +80,14 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     });
 
     if (error) {
+      authLog("login error", { message: error.message });
       throw error;
     }
   }, []);
 
   const logout = useCallback(async () => {
     setLoading(true);
+    authLog("logout start");
 
     try {
       const { error } = await supabase.auth.signOut();
@@ -93,8 +98,11 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
 
       setUser(null);
       setProfile(null);
+      authLog("logout ok");
     } catch (error: unknown) {
-      console.error("Error cerrando sesión:", error);
+      authLog("logout error", {
+        message: error instanceof Error ? error.message : "unknown",
+      });
       throw error;
     } finally {
       setLoading(false);
@@ -102,9 +110,15 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   }, []);
 
   useEffect(() => {
+    void loadSession();
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      authLog("onAuthStateChange", {
+        event,
+        hasUser: Boolean(session?.user),
+      });
       setUser(session?.user ?? null);
 
       if (
@@ -119,7 +133,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [loadSession]);
 
   useEffect(() => {
     const userId = user?.id;
@@ -165,7 +179,6 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
       login,
       logout,
       loadSession,
-      setUser,
     }),
     [user, loading, profile, profileLoading, login, logout, loadSession],
   );

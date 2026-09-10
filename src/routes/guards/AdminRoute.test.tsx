@@ -63,4 +63,14 @@ describe("AdminRoute", () => {
 
     expect(await screen.findByText("panel admin")).toBeInTheDocument();
   });
+
+  test("does not redirect while session loading", () => {
+    mockSecurity.loading = true;
+
+    renderAdmin();
+
+    expect(screen.getByText("Verificando permisos...")).toBeInTheDocument();
+    expect(screen.queryByText("inicio")).not.toBeInTheDocument();
+    expect(screen.queryByText("panel admin")).not.toBeInTheDocument();
+  });
 });

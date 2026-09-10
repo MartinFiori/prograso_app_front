@@ -9,6 +9,8 @@ if (!supabaseUrl || !supabasePublishableKey) {
   );
 }
 
+// PKCE: detectSessionInUrl exchanges `code` once. Do not also call
+// exchangeCodeForSession from AuthCallback.
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
     persistSession: true,

@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 import { Avatar } from "../Avatar/Avatar";
 import { Button } from "../Button/Button";
@@ -6,7 +7,25 @@ import { useSecurity } from "../../context/SecurityContext";
 import styles from "./Navbar.module.scss";
 
 export default function Navbar() {
-  const { login, logout, isAuthenticated, isAdmin, user } = useSecurity();
+  const { login, logout, isAuthenticated, isAdmin, user, loading } =
+    useSecurity();
+  const location = useLocation();
+  const [loginBusy, setLoginBusy] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const onCallback = location.pathname === "/auth/callback";
+  const hideLogin = loading || onCallback || loginBusy;
+
+  async function handleLogin(): Promise<void> {
+    setLoginBusy(true);
+    setLoginError(null);
+
+    try {
+      await login();
+    } catch {
+      setLoginBusy(false);
+      setLoginError("No pudimos abrir Google. Probá de nuevo.");
+    }
+  }
 
   return (
     <nav
@@ -31,6 +50,15 @@ export default function Navbar() {
       </div>
 
       <div className={styles.nav_end}>
+        {loginError ? (
+          <p
+            className={styles.login_error}
+            role="alert"
+          >
+            {loginError}
+          </p>
+        ) : null}
+
         {isAuthenticated ? (
           <div className={styles.avatar_container}>
             <Avatar
@@ -44,12 +72,23 @@ export default function Navbar() {
         {isAuthenticated ? (
           <Button
             variant="ghost"
-            onClick={logout}
+            onClick={() => {
+              void logout();
+            }}
           >
             Cerrar sesión
           </Button>
+        ) : hideLogin ? (
+          loading || onCallback ? null : (
+            <Button
+              loading
+              loadingText="Redirigiendo a Google…"
+            >
+              Iniciar sesión
+            </Button>
+          )
         ) : (
-          <Button onClick={login}>Iniciar sesión</Button>
+          <Button onClick={() => void handleLogin()}>Iniciar sesión</Button>
         )}
       </div>
     </nav>
