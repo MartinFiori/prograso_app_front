@@ -1,15 +1,25 @@
 @use "../scss/mixins" as *;
 
 .layout {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-areas:
+    "bar"
+    "content";
+  grid-template-columns: minmax(0, 1fr);
   min-height: calc(100dvh - var(--header-height));
+
+  @include screen-min($breakpoint-lg) {
+    grid-template-areas: "sidebar content";
+    grid-template-columns: auto minmax(0, 1fr);
+  }
 }
 
-.tabs {
+/* Barra con la hamburguesa: solo bajo el breakpoint de escritorio. */
+.bar {
+  grid-area: bar;
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-2);
+  align-items: center;
+  gap: var(--spacing-3);
   padding: var(--spacing-3) var(--page-padding-mobile);
   border-bottom: var(--border-width) solid var(--color-border);
   background: var(--color-sidebar-background);
@@ -17,13 +27,135 @@
   @include screen-min($breakpoint-md) {
     padding-inline: var(--page-padding-tablet);
   }
+
+  @include screen-min($breakpoint-lg) {
+    display: none;
+  }
+}
+
+.menu_button,
+.collapse_toggle,
+.drawer_close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  padding-inline: var(--spacing-3);
+
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+
+  @include interactive-focus;
+
+  &:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-soft);
+  }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-overlay);
+
+  border: 0;
+  padding: 0;
+  background: var(--color-overlay);
+  cursor: pointer;
+
+  @include screen-min($breakpoint-lg) {
+    display: none;
+  }
+}
+
+.sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  width: var(--sidebar-width);
+  padding: var(--spacing-3) var(--spacing-3) var(--spacing-6);
+  background: var(--color-sidebar-background);
+
+  /* Bajo escritorio el sidebar es un drawer fuera de pantalla. */
+  position: fixed;
+  top: var(--header-height);
+  bottom: 0;
+  left: 0;
+  z-index: calc(var(--z-index-overlay) + 1);
+  max-width: calc(100% - var(--spacing-8));
+  overflow-y: auto;
+  border-right: var(--border-width) solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(-100%);
+  transition:
+    var(--transition-transform),
+    visibility var(--duration-normal) var(--ease-out);
+
+  /* Cerrado fuera de pantalla no debe recibir foco de teclado. */
+  visibility: hidden;
+
+  &.open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  @include screen-min($breakpoint-lg) {
+    position: sticky;
+    top: var(--header-height);
+    z-index: var(--z-index-base);
+    height: calc(100dvh - var(--header-height));
+    max-width: none;
+    box-shadow: none;
+    transform: none;
+    transition: var(--transition-default);
+    visibility: visible;
+
+    &.collapsed {
+      width: var(--sidebar-collapsed-width);
+      padding-inline: var(--spacing-2);
+    }
+  }
+}
+
+.sidebar_header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+  min-height: var(--touch-target-min);
+}
+
+.drawer_close {
+  @include screen-min($breakpoint-lg) {
+    display: none;
+  }
+}
+
+.collapse_toggle {
+  @include screen-max($breakpoint-lg) {
+    display: none;
+  }
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
 }
 
 .tab {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  gap: var(--spacing-3);
   min-height: var(--touch-target-min);
-  padding: var(--spacing-2) var(--spacing-4);
+  padding: var(--spacing-2) var(--spacing-3);
 
   border-radius: var(--radius-md);
   color: var(--color-text-secondary);
@@ -40,6 +172,50 @@
   &.active {
     color: var(--color-primary-contrast);
     background: var(--color-primary);
-    box-shadow: inset 0 -3px 0 var(--color-accent);
+    box-shadow: inset 3px 0 0 var(--color-accent);
+  }
+}
+
+.tab_short {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+  color: inherit;
+  font-size: var(--font-size-sm);
+}
+
+.tab_label {
+  @include truncate;
+}
+
+/* El rail colapsado solo existe en escritorio: el drawer siempre
+   muestra los labels completos. */
+.collapsed {
+  @include screen-min($breakpoint-lg) {
+    .tab {
+      justify-content: center;
+      padding-inline: var(--spacing-2);
+    }
+
+    .tab_label {
+      @include visually-hidden;
+    }
+  }
+}
+
+.content {
+  grid-area: content;
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
   }
 }
