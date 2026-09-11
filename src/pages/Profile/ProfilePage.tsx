@@ -203,6 +203,14 @@ export default function ProfilePage() {
 
   return (
     <main className={catalog.page}>
+      <header className={catalog.masthead}>
+        <h1>Mi perfil</h1>
+        <p className={catalog.lede}>
+          Tus datos de la cuenta. El email viene de Google y no se puede
+          cambiar acá.
+        </p>
+      </header>
+
       {profileError && !incomplete ? (
         <div
           className={catalog.error}
