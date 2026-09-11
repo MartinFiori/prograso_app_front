@@ -1,152 +1,31 @@
-import { FormEvent, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "../../../components/Button/Button";
-import {
-  DescriptionList,
-  emptyDisplay,
-} from "../../../components/DescriptionList/DescriptionList";
-import { Modal } from "../../../components/Modal/Modal";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
 import {
+  ADMIN_REGISTRATIONS_TABLE_LIMIT,
   parseEventIdParam,
   useAdminEventsOptions,
   useAdminRegistrations,
   useRegistrationStatuses,
 } from "../../../hooks/useAdminRegistrations";
-import { isConnectionError, useConnection } from "../../../hooks/useConnection";
-import { listAdminUsersPath } from "../../../services/adminUsersApi";
-import type { ApiResponse } from "../../../types";
-import type { AdminRegistration, AdminUser } from "../../../types/admin";
-import { formatConnectionError } from "../../../utils/apiError";
-import { formatEventDateTime } from "../../../utils/eventDisplay";
+import type { AdminRegistration } from "../../../types/admin";
+import {
+  formatEventDateTime,
+  statusLabel,
+} from "../../../utils/eventDisplay";
 import { ResourcePager } from "../ResourcePager";
-import styles from "../adminShared.module.scss";
-
-const PICKER_LIMIT = 100;
-
-function RegistrationRow({
-  registration,
-  statuses,
-  onSave,
-  onRemoveFromSet,
-  onDetails,
-}: {
-  registration: AdminRegistration;
-  statuses: { code: string; label: string }[];
-  onSave: (
-    id: number,
-    body: { status_code?: string; waitlist_position?: number | null },
-  ) => Promise<string | null>;
-  onRemoveFromSet: (userId: string) => void;
-  onDetails: (registration: AdminRegistration) => void;
-}) {
-  const writableStatuses = statuses.filter(
-    (status) => status.code === "confirmed" || status.code === "waitlisted",
-  );
-  const statusOptions =
-    writableStatuses.length > 0
-      ? writableStatuses
-      : [{ code: registration.status_code, label: registration.status_code }];
-  const [statusCode, setStatusCode] = useState(registration.status_code);
-  const [position, setPosition] = useState(
-    registration.waitlist_position == null
-      ? ""
-      : String(registration.waitlist_position),
-  );
-  const [busy, setBusy] = useState(false);
-  const [rowError, setRowError] = useState<string | null>(null);
-
-  async function save() {
-    setBusy(true);
-    setRowError(null);
-
-    const body: {
-      status_code?: string;
-      waitlist_position?: number | null;
-    } = { status_code: statusCode };
-
-    if (statusCode === "waitlisted") {
-      body.waitlist_position = position ? Number(position) : null;
-    }
-
-    const error = await onSave(registration.id, body);
-    setBusy(false);
-
-    if (error) {
-      setRowError(error);
-    }
-  }
-
-  return (
-    <tr>
-      <td>{registration.profile?.name ?? registration.user_id}</td>
-      <td>{registration.user_id}</td>
-      <td>
-        <select
-          className={styles.select}
-          value={statusCode}
-          onChange={(event) => setStatusCode(event.target.value)}
-          aria-label={`Estado de ${registration.user_id}`}
-        >
-          {statusOptions.map((status) => (
-            <option
-              key={status.code}
-              value={status.code}
-            >
-              {status.label}
-            </option>
-          ))}
-        </select>
-      </td>
-      <td>
-        <input
-          className={styles.input}
-          type="number"
-          min={1}
-          value={position}
-          onChange={(event) => setPosition(event.target.value)}
-          disabled={statusCode !== "waitlisted"}
-          aria-label={`Posición de espera de ${registration.user_id}`}
-        />
-      </td>
-      <td>
-        <div className={styles.tableActions}>
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => onDetails(registration)}
-          >
-            Ver detalles
-          </Button>
-          <Button
-            size="sm"
-            loading={busy}
-            onClick={() => void save()}
-          >
-            Guardar
-          </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            disabled={busy}
-            onClick={() => onRemoveFromSet(registration.user_id)}
-          >
-            Quitar del conjunto
-          </Button>
-        </div>
-        {rowError ? (
-          <p
-            className={styles.error}
-            role="alert"
-          >
-            {rowError}
-          </p>
-        ) : null}
-      </td>
-    </tr>
-  );
-}
+import shared from "../adminShared.module.scss";
+import { AddPlayerModal } from "./AddPlayerModal";
+import { RegistrationDetailModal } from "./RegistrationDetailModal";
+import { RemovePlayerModal } from "./RemovePlayerModal";
+import styles from "./RegistrationsPage.module.scss";
+import {
+  catalogLabel,
+  matchesPlayerSearch,
+  playerName,
+} from "./playerDisplay";
 
 export default function RegistrationsPage() {
   const navigate = useNavigate();
@@ -155,19 +34,62 @@ export default function RegistrationsPage() {
   const options = useAdminEventsOptions();
   const statuses = useRegistrationStatuses();
   const list = useAdminRegistrations(eventId);
-  const connection = useConnection();
   const [query, setQuery] = useState("");
-  const [pickerUsers, setPickerUsers] = useState<AdminUser[]>([]);
-  const [pickerError, setPickerError] = useState<string | null>(null);
-  const [searching, setSearching] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [createUserId, setCreateUserId] = useState("");
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
+  const [page, setPage] = useState(1);
+  const [tableLimit, setTableLimit] = useState(ADMIN_REGISTRATIONS_TABLE_LIMIT);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   const [detail, setDetail] = useState<AdminRegistration | null>(null);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [pendingRemove, setPendingRemove] = useState<AdminRegistration | null>(
+    null,
+  );
+  const [removing, setRemoving] = useState(false);
+  const [removeError, setRemoveError] = useState<string | null>(null);
+
+  const selectedEvent = options.events.find((event) => event.id === eventId);
+  const eventTitle = selectedEvent?.title ?? "";
+  const emails = useMemo(
+    () => (list.state.status === "success" ? list.state.emails : {}),
+    [list.state],
+  );
+  const registrations = useMemo(
+    () => (list.state.status === "success" ? list.state.registrations : []),
+    [list.state],
+  );
+  const meta = list.state.status === "success" ? list.state.meta : null;
+  const registeredUserIds = useMemo(
+    () => new Set(registrations.map((row) => row.user_id)),
+    [registrations],
+  );
+  const filtered = useMemo(
+    () =>
+      registrations.filter((row) =>
+        matchesPlayerSearch(row, emails[row.user_id], query),
+      ),
+    [emails, query, registrations],
+  );
+  const totalPages = Math.max(1, Math.ceil(filtered.length / tableLimit) || 1);
+  const safePage = Math.min(page, totalPages);
+  const pageRows = filtered.slice(
+    (safePage - 1) * tableLimit,
+    safePage * tableLimit,
+  );
+
+  useEffect(() => {
+    setQuery("");
+    setPage(1);
+    setAddOpen(false);
+    setCreateError(null);
+    setDetail(null);
+    setDetailError(null);
+    setPendingRemove(null);
+    setRemoveError(null);
+    setStatusMessage(null);
+  }, [eventId]);
 
   function onSelectEvent(nextId: string) {
     if (!nextId) {
@@ -178,47 +100,14 @@ export default function RegistrationsPage() {
     navigate(`/admin/inscripciones/${nextId}`);
   }
 
-  async function handleSearch(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSearching(true);
-    setPickerError(null);
-
-    const result = await connection<ApiResponse<AdminUser[]>>({
-      url: listAdminUsersPath({ page: 1, limit: PICKER_LIMIT, q: query }),
-    });
-
-    setSearching(false);
-
-    if (isConnectionError(result)) {
-      setPickerError(formatConnectionError(result));
-      return;
-    }
-
-    setPickerUsers(result.data ?? []);
-  }
-
-  async function handleSave() {
-    setSaving(true);
-    setSaveError(null);
-    const error = await list.sync();
-    setSaving(false);
-
-    if (error) {
-      setSaveError(error);
-    }
-  }
-
-  async function handleCreate(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!createUserId.trim()) {
-      setCreateError("El user_id es obligatorio.");
+  async function handleCreate(userId: string) {
+    if (creating) {
       return;
     }
 
     setCreating(true);
     setCreateError(null);
-    const error = await list.create(createUserId.trim());
+    const error = await list.create(userId);
     setCreating(false);
 
     if (error) {
@@ -226,67 +115,142 @@ export default function RegistrationsPage() {
       return;
     }
 
-    setCreateOpen(false);
-    setCreateUserId("");
-    setStatusMessage("Inscripción creada.");
+    setAddOpen(false);
+    setStatusMessage("Jugador agregado.");
+  }
+
+  async function handleUpdate(
+    id: number,
+    body: { status_code?: string; waitlist_position?: number | null },
+  ): Promise<string | null> {
+    if (saving) {
+      return "La inscripción se está guardando.";
+    }
+
+    setSaving(true);
+    setDetailError(null);
+    const error = await list.update(id, body);
+    setSaving(false);
+
+    if (error) {
+      setDetailError(error);
+      return error;
+    }
+
+    setStatusMessage("Inscripción actualizada.");
+    setDetail(null);
+    return null;
+  }
+
+  async function handleRemove() {
+    if (!pendingRemove || removing) {
+      return;
+    }
+
+    setRemoving(true);
+    setRemoveError(null);
+    const error = await list.remove(pendingRemove.id);
+    setRemoving(false);
+
+    if (error) {
+      setRemoveError(error);
+      return;
+    }
+
+    setPendingRemove(null);
+    setStatusMessage("Jugador quitado del evento.");
   }
 
   const loadingList = list.state.status === "loading" || options.loading;
-  const pagination =
-    list.state.status === "success" ? list.state.pagination : null;
+  const eventStatusText = selectedEvent
+    ? statusLabel(selectedEvent.status_code, options.statuses)
+    : null;
 
   return (
-    <main className={styles.page}>
-      <header className={styles.header}>
-        <h1>Inscripciones</h1>
-        {eventId != null ? (
-          <Button onClick={() => setCreateOpen(true)}>+ Crear inscripción</Button>
-        ) : null}
+    <main className={shared.page}>
+      <header className={`${shared.header} ${styles.header}`}>
+        <div className={styles.headerCopy}>
+          <h1>Inscripciones</h1>
+          <p className={styles.lede}>
+            Gestioná los jugadores inscriptos en cada evento
+          </p>
+        </div>
+        <Button
+          disabled={eventId == null}
+          onClick={() => {
+            if (eventId != null) {
+              setAddOpen(true);
+            }
+          }}
+        >
+          Agregar jugador
+        </Button>
       </header>
 
       {statusMessage ? (
         <p
-          className={styles.status}
+          className={shared.status}
           role="status"
         >
           {statusMessage}
         </p>
       ) : null}
 
-      <label className={styles.field}>
-        <span className={styles.label}>Evento</span>
-        <select
-          className={styles.select}
-          value={eventId ?? ""}
-          onChange={(event) => onSelectEvent(event.target.value)}
-          aria-label="Evento"
-        >
-          <option value="">Elegí un evento</option>
-          {options.events.map((eventItem) => (
-            <option
-              key={eventItem.id}
-              value={eventItem.id}
+      <section className={styles.card}>
+        <div className={styles.eventRow}>
+          <label className={`${shared.field} ${styles.eventField}`}>
+            <span className={shared.label}>Evento</span>
+            <select
+              className={shared.select}
+              value={eventId ?? ""}
+              onChange={(event) => onSelectEvent(event.target.value)}
+              disabled={options.loading}
             >
-              {eventItem.title} ({eventItem.status_code})
-            </option>
-          ))}
-        </select>
-      </label>
+              <option value="">Elegí un evento</option>
+              {options.events.map((eventItem) => {
+                const date = formatEventDateTime(eventItem.starts_at);
+                const status = statusLabel(
+                  eventItem.status_code,
+                  options.statuses,
+                );
+
+                return (
+                  <option
+                    key={eventItem.id}
+                    value={eventItem.id}
+                  >
+                    {eventItem.title} — {date} — {status}
+                  </option>
+                );
+              })}
+            </select>
+          </label>
+          {eventStatusText ? (
+            <span className={styles.statusTag}>{eventStatusText}</span>
+          ) : null}
+        </div>
+      </section>
 
       {options.error ? (
         <p
-          className={styles.error}
+          className={shared.error}
           role="alert"
         >
           {options.error}
         </p>
       ) : null}
 
+      {!options.loading && options.events.length === 0 && !options.error ? (
+        <p className={shared.message}>No hay eventos.</p>
+      ) : null}
+
       {eventId === null ? (
-        <p className={styles.message}>Elegí un evento para ver inscripciones.</p>
+        <p className={shared.message}>
+          Elegí un evento para ver los jugadores inscriptos.
+        </p>
       ) : list.state.status === "error" ? (
         <div
-          className={styles.error}
+          className={shared.error}
           role="alert"
         >
           <p>{list.state.message}</p>
@@ -294,220 +258,201 @@ export default function RegistrationsPage() {
         </div>
       ) : (
         <>
-          {list.state.status === "success" && list.state.meta ? (
-            <div className={styles.meta}>
-              <p>Cupo: {list.state.meta.capacity}</p>
-              <p>Confirmados: {list.state.meta.confirmed_count}</p>
-              <p>En espera: {list.state.meta.waitlisted_count}</p>
+          {meta ? (
+            <div className={styles.metrics}>
+              <div className={styles.metric}>
+                <span className={styles.metricLabel}>Cupo</span>
+                <span className={styles.metricValue}>{meta.capacity}</span>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.metricLabel}>Confirmados</span>
+                <span className={styles.metricValue}>
+                  {meta.confirmed_count}
+                </span>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.metricLabel}>En espera</span>
+                <span className={styles.metricValue}>
+                  {meta.waitlisted_count}
+                </span>
+              </div>
             </div>
           ) : null}
 
-          <p>Conjunto deseado: {list.desiredUserIds.length} usuarios</p>
-
-          <form
-            className={styles.filters}
-            onSubmit={(formEvent) => void handleSearch(formEvent)}
-          >
-            <label className={styles.field}>
-              <span className={styles.label}>Buscar usuarios</span>
-              <input
-                className={styles.input}
-                value={query}
-                onChange={(changeEvent) => setQuery(changeEvent.target.value)}
-                name="q"
-                aria-label="Buscar usuarios"
-              />
-            </label>
-            <Button
-              type="submit"
-              loading={searching}
-            >
-              Buscar
-            </Button>
-          </form>
-
-          {pickerError ? (
-            <p
-              className={styles.error}
-              role="alert"
-            >
-              {pickerError}
-            </p>
-          ) : null}
-
-          {pickerUsers.length > 0 ? (
-            <ul>
-              {pickerUsers.map((user) => (
-                <li key={user.id}>
-                  {user.name ?? user.email ?? user.id}
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      const error = list.addDesired(user.id);
-                      if (error) {
-                        setPickerError(error);
-                      }
-                    }}
-                  >
-                    Agregar
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-
-          <div className={styles.actions}>
-            <Button
-              onClick={() => void handleSave()}
-              loading={saving}
-            >
-              Guardar conjunto
-            </Button>
-          </div>
-
-          {saveError ? (
-            <p
-              className={styles.error}
-              role="alert"
-            >
-              {saveError}
-            </p>
-          ) : null}
-
-          <div className={styles.tableWrap}>
-            {loadingList ? (
-              <div className={styles.tableStatus}>
-                <PadelLoader label="Cargando inscripciones..." />
+          <section className={styles.card}>
+            <div className={styles.rosterHead}>
+              <div>
+                <h2 className={styles.rosterTitle}>Jugadores inscriptos</h2>
+                <p className={styles.rosterCount}>
+                  {registrations.length} jugadores en este evento
+                </p>
               </div>
-            ) : list.state.status === "success" &&
-              list.state.registrations.length === 0 ? (
-              <p className={styles.tableStatus}>
-                No hay inscripciones en este evento.
-              </p>
-            ) : list.state.status === "success" ? (
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Usuario</th>
-                    <th>Estado</th>
-                    <th>Espera</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {list.state.registrations.map((registration) => (
-                    <RegistrationRow
-                      key={registration.id}
-                      registration={registration}
-                      statuses={statuses}
-                      onSave={list.update}
-                      onRemoveFromSet={list.removeDesired}
-                      onDetails={setDetail}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            ) : null}
-          </div>
+              <label className={`${shared.field} ${styles.searchField}`}>
+                <span className={shared.label}>Buscar</span>
+                <input
+                  className={shared.input}
+                  value={query}
+                  onChange={(changeEvent) => {
+                    setQuery(changeEvent.target.value);
+                    setPage(1);
+                  }}
+                  placeholder="Buscar por nombre o correo"
+                />
+              </label>
+            </div>
 
-          {pagination ? (
-            <ResourcePager
-              page={list.page}
-              totalPages={pagination.total_pages}
-              total={pagination.total}
-              limit={list.tableLimit}
-              noun="inscripciones"
-              disabled={loadingList}
-              onPageChange={list.setPage}
-              onLimitChange={(next) => {
-                list.setTableLimit(next);
-                list.setPage(1);
-              }}
-            />
-          ) : null}
+            <div className={shared.tableWrap}>
+              {loadingList ? (
+                <div className={shared.tableStatus}>
+                  <PadelLoader label="Cargando inscripciones..." />
+                </div>
+              ) : registrations.length === 0 ? (
+                <p className={shared.tableStatus}>
+                  No hay jugadores inscriptos en este evento.
+                </p>
+              ) : filtered.length === 0 ? (
+                <p className={shared.tableStatus}>
+                  No hay resultados para esa búsqueda.
+                </p>
+              ) : (
+                <table className={shared.table}>
+                  <thead>
+                    <tr>
+                      <th>Jugador</th>
+                      <th>Correo</th>
+                      <th>Estado</th>
+                      <th>Lista de espera</th>
+                      <th>Inscripción</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pageRows.map((registration) => {
+                      const email = emails[registration.user_id];
+                      const name = playerName(registration, email);
+                      const confirmed = registration.status_code === "confirmed";
+
+                      return (
+                        <tr key={registration.id}>
+                          <td>
+                            <div className={styles.playerCell}>
+                              <span className={styles.playerName}>{name}</span>
+                            </div>
+                          </td>
+                          <td>{email?.trim() ? email : "—"}</td>
+                          <td>
+                            <span
+                              className={`${styles.tag} ${
+                                confirmed
+                                  ? styles.tagConfirmed
+                                  : styles.tagWaitlisted
+                              }`}
+                            >
+                              {catalogLabel(registration.status_code, statuses)}
+                            </span>
+                          </td>
+                          <td>
+                            {confirmed
+                              ? "—"
+                              : registration.waitlist_position ?? "—"}
+                          </td>
+                          <td>
+                            {formatEventDateTime(registration.created_at)}
+                          </td>
+                          <td>
+                            <div className={styles.rowActions}>
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => setDetail(registration)}
+                              >
+                                Ver detalles
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setPendingRemove(registration)}
+                              >
+                                Quitar del evento
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {filtered.length > 0 ? (
+              <ResourcePager
+                page={safePage}
+                totalPages={totalPages}
+                total={filtered.length}
+                limit={tableLimit}
+                noun="jugadores"
+                disabled={loadingList}
+                onPageChange={setPage}
+                onLimitChange={(next) => {
+                  setTableLimit(next);
+                  setPage(1);
+                }}
+              />
+            ) : null}
+          </section>
         </>
       )}
 
-      <Modal
-        open={createOpen}
-        title="Crear inscripción"
+      <AddPlayerModal
+        open={addOpen}
+        eventTitle={eventTitle || "este evento"}
+        registeredUserIds={registeredUserIds}
+        creating={creating}
+        error={createError}
         onClose={() => {
           if (!creating) {
-            setCreateOpen(false);
+            setAddOpen(false);
             setCreateError(null);
-            setCreateUserId("");
           }
         }}
-        busy={creating}
-      >
-        <form
-          className={styles.form}
-          onSubmit={(formEvent) => void handleCreate(formEvent)}
-        >
-          <label className={styles.field}>
-            <span className={styles.label}>user_id *</span>
-            <input
-              className={styles.input}
-              name="user_id"
-              value={createUserId}
-              onChange={(changeEvent) => setCreateUserId(changeEvent.target.value)}
-              required
-            />
-          </label>
-          {createError ? (
-            <p
-              className={styles.error}
-              role="alert"
-            >
-              {createError}
-            </p>
-          ) : null}
-          <Button
-            type="submit"
-            loading={creating}
-          >
-            Crear
-          </Button>
-        </form>
-      </Modal>
+        onSubmit={handleCreate}
+      />
 
-      <Modal
-        open={detail != null}
-        title={
-          detail
-            ? `Inscripción ${detail.id}`
-            : "Detalle"
+      <RegistrationDetailModal
+        registration={detail}
+        eventTitle={eventTitle}
+        email={detail ? emails[detail.user_id] : undefined}
+        statuses={statuses}
+        saving={saving}
+        error={detailError}
+        onClose={() => {
+          if (!saving) {
+            setDetail(null);
+            setDetailError(null);
+          }
+        }}
+        onSave={handleUpdate}
+      />
+
+      <RemovePlayerModal
+        open={pendingRemove != null}
+        playerName={
+          pendingRemove
+            ? playerName(pendingRemove, emails[pendingRemove.user_id])
+            : ""
         }
-        onClose={() => setDetail(null)}
-      >
-        {detail ? (
-          <DescriptionList
-            items={[
-              { label: "Id", value: emptyDisplay(detail.id) },
-              { label: "Evento", value: emptyDisplay(detail.event_id) },
-              { label: "Usuario", value: detail.user_id },
-              {
-                label: "Nombre",
-                value: emptyDisplay(detail.profile?.name),
-              },
-              { label: "Estado", value: detail.status_code },
-              {
-                label: "Espera",
-                value: emptyDisplay(detail.waitlist_position),
-              },
-              {
-                label: "Creada",
-                value: formatEventDateTime(detail.created_at),
-              },
-              {
-                label: "Actualizada",
-                value: formatEventDateTime(detail.updated_at),
-              },
-            ]}
-          />
-        ) : null}
-      </Modal>
+        eventTitle={eventTitle || "este evento"}
+        busy={removing}
+        error={removeError}
+        onClose={() => {
+          if (!removing) {
+            setPendingRemove(null);
+            setRemoveError(null);
+          }
+        }}
+        onConfirm={() => void handleRemove()}
+      />
     </main>
   );
 }

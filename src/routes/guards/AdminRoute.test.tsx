@@ -31,6 +31,10 @@ function renderAdmin(path = "/admin/categorias") {
             path="/admin/eventos"
             element={<p>eventos admin</p>}
           />
+          <Route
+            path="/admin/inscripciones"
+            element={<p>inscripciones admin</p>}
+          />
         </Route>
       </Routes>
     </MemoryRouter>,
@@ -45,14 +49,14 @@ describe("AdminRoute", () => {
     mockSecurity.isAdmin = false;
   });
 
-  test("redirects a non-admin from /admin/eventos to home", async () => {
+  test("redirects a non-admin from /admin/inscripciones to home", async () => {
     mockSecurity.isAuthenticated = true;
     mockSecurity.isAdmin = false;
 
-    renderAdmin("/admin/eventos");
+    renderAdmin("/admin/inscripciones");
 
     expect(await screen.findByText("inicio")).toBeInTheDocument();
-    expect(screen.queryByText("eventos admin")).not.toBeInTheDocument();
+    expect(screen.queryByText("inscripciones admin")).not.toBeInTheDocument();
   });
 
   test("allows an admin", async () => {
