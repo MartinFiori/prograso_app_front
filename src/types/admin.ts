@@ -40,6 +40,7 @@ export type AdminRegistration = {
   user_id: string;
   status_code: string;
   waitlist_position: number | null;
+  has_paid?: boolean;
   created_at: string;
   updated_at: string;
   profile?: AdminProfileEmbed;

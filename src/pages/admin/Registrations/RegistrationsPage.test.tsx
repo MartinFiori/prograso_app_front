@@ -69,6 +69,7 @@ const anaRegistration = {
   user_id: anaId,
   status_code: "confirmed",
   waitlist_position: null,
+  has_paid: false,
   created_at: "2026-09-04T18:00:00.000Z",
   updated_at: "2026-09-04T18:00:00.000Z",
   profile: {
@@ -85,6 +86,7 @@ const waitlistedRegistration = {
   user_id: "22222222-2222-4222-8222-222222222222",
   status_code: "waitlisted",
   waitlist_position: 1,
+  has_paid: true,
   created_at: "2026-09-05T18:00:00.000Z",
   updated_at: "2026-09-05T18:00:00.000Z",
   profile: {
@@ -175,9 +177,12 @@ function installFetch(handler: (url: string, init?: RequestInit) => Promise<Resp
 function defaultHandler(options: {
   registrationsFor4?: typeof registrationsBody;
   postDelayMs?: number;
+  paidDelayMs?: number;
+  paidError?: boolean;
   onPost?: (body: string | undefined) => void;
   onDelete?: (url: string) => void;
   onPatch?: (body: string | undefined) => void;
+  onPaidPatch?: (url: string, body: string | undefined) => void;
 } = {}) {
   const registrationsFor4 = options.registrationsFor4 ?? registrationsBody;
 
@@ -207,6 +212,49 @@ function defaultHandler(options: {
           { code: "waitlisted", label: "En espera", description: null },
         ],
       });
+    }
+
+    if (href.includes("/registrations/") && href.endsWith("/paid") && method === "PATCH") {
+      options.onPaidPatch?.(href, typeof init?.body === "string" ? init.body : undefined);
+
+      if (options.paidError) {
+        return jsonResponse(
+          {
+            status: "error",
+            statusCode: 404,
+            description: "Registration not found",
+            errorCode: "registration_not_found",
+            data: null,
+          },
+          404,
+        );
+      }
+
+      const response = jsonResponse({
+        status: "success",
+        statusCode: 200,
+        description: "OK",
+        data: {
+          id: anaRegistration.id,
+          event_id: 4,
+          user_id: anaId,
+          status_code: anaRegistration.status_code,
+          waitlist_position: anaRegistration.waitlist_position,
+          has_paid: true,
+          created_at: anaRegistration.created_at,
+          updated_at: anaRegistration.updated_at,
+        },
+      });
+
+      if (options.paidDelayMs) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            void response.then(resolve);
+          }, options.paidDelayMs);
+        });
+      }
+
+      return response;
     }
 
     if (href.includes("/admin/events/4/registrations") && method === "POST") {
@@ -606,5 +654,93 @@ describe("RegistrationsPage", () => {
     expect(
       (global.fetch as jest.Mock).mock.calls.some((call) => call[1]?.method === "PUT"),
     ).toBe(false);
+  });
+
+  test("shows Pendiente and Pagado from has_paid", async () => {
+    installFetch(defaultHandler());
+    renderPage("/admin/inscripciones/4");
+
+    expect(await screen.findByText("Ana Gomez")).toBeInTheDocument();
+    const table = screen.getByRole("table");
+    const anaRow = within(table).getByText("Ana Gomez").closest("tr");
+    const brunoRow = within(table).getByText("Bruno Perez").closest("tr");
+    expect(anaRow).not.toBeNull();
+    expect(brunoRow).not.toBeNull();
+    expect(within(anaRow as HTMLElement).getByText("Pendiente")).toBeInTheDocument();
+    expect(within(brunoRow as HTMLElement).getByText("Pagado")).toBeInTheDocument();
+  });
+
+  test("PATCHes paid once while in flight", async () => {
+    const paidCalls: Array<{ url: string; body: string | undefined }> = [];
+    installFetch(
+      defaultHandler({
+        paidDelayMs: 80,
+        onPaidPatch: (url, body) => {
+          paidCalls.push({ url, body });
+        },
+      }),
+    );
+    renderPage("/admin/inscripciones/4");
+
+    expect(await screen.findByText("Ana Gomez")).toBeInTheDocument();
+    const table = screen.getByRole("table");
+    const anaRow = within(table).getByText("Ana Gomez").closest("tr");
+    expect(anaRow).not.toBeNull();
+    const markPaid = within(anaRow as HTMLElement).getByRole("button", {
+      name: "Marcar como pagado",
+    });
+    await userEvent.click(markPaid);
+    await userEvent.click(markPaid);
+
+    await waitFor(() => {
+      expect(paidCalls).toHaveLength(1);
+    });
+    expect(paidCalls[0]?.url).toMatch(
+      new RegExp(`/events/4/registrations/${anaId}/paid$`),
+    );
+    expect(paidCalls[0]?.body).toBe("{}");
+    expect(paidCalls[0]?.url).not.toMatch(/\/admin\/event-registrations\//);
+  });
+
+  test("hides mark-paid CTA when already paid", async () => {
+    installFetch(defaultHandler());
+    renderPage("/admin/inscripciones/4");
+
+    expect(await screen.findByText("Bruno Perez")).toBeInTheDocument();
+    const table = screen.getByRole("table");
+    const brunoRow = within(table).getByText("Bruno Perez").closest("tr");
+    expect(brunoRow).not.toBeNull();
+    expect(
+      within(brunoRow as HTMLElement).queryByRole("button", {
+        name: "Marcar como pagado",
+      }),
+    ).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getAllByRole("button", { name: "Ver detalles" })[1]);
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByText("Pagado")).toBeInTheDocument();
+    expect(
+      within(dialog).queryByRole("button", { name: "Marcar como pagado" }),
+    ).not.toBeInTheDocument();
+  });
+
+  test("keeps Pendiente when paid PATCH returns 404", async () => {
+    installFetch(defaultHandler({ paidError: true }));
+    renderPage("/admin/inscripciones/4");
+
+    expect(await screen.findByText("Ana Gomez")).toBeInTheDocument();
+    const table = screen.getByRole("table");
+    const anaRow = within(table).getByText("Ana Gomez").closest("tr");
+    expect(anaRow).not.toBeNull();
+    await userEvent.click(
+      within(anaRow as HTMLElement).getByRole("button", {
+        name: "Marcar como pagado",
+      }),
+    );
+
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText(/registration_not_found/)).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(within(anaRow as HTMLElement).getByText("Pendiente")).toBeInTheDocument();
   });
 });

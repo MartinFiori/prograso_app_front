@@ -146,6 +146,13 @@ export function updateAdminRegistrationPath(registrationId: number): string {
   return `/admin/event-registrations/${registrationId}`;
 }
 
+export function markAdminRegistrationPaidPath(
+  eventId: number,
+  userId: string,
+): string {
+  return `/events/${eventId}/registrations/${userId}/paid`;
+}
+
 export function deleteAdminRegistrationPath(registrationId: number): string {
   return `/admin/event-registrations/${registrationId}`;
 }

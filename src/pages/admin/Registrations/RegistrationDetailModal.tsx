@@ -157,6 +157,11 @@ export function RegistrationDetailModal({
                 value: catalogLabel(registration.status_code, statuses),
               },
               {
+                label: "Pago",
+                value:
+                  registration.has_paid === true ? "Pagado" : "Pendiente",
+              },
+              {
                 label: "Posición en lista de espera",
                 value:
                   registration.status_code === "waitlisted"

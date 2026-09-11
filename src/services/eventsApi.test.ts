@@ -10,6 +10,7 @@ import {
   getMyRegistrationPath,
   listAdminEventsPath,
   listAdminRegistrationsPath,
+  markAdminRegistrationPaidPath,
   listCategoriesPath,
   listEventsPath,
   listRegistrationsByEventPath,
@@ -58,6 +59,11 @@ describe("eventsApi", () => {
     expect(registerForEventPath(4)).toBe("/events/4/registrations");
     expect(getMyRegistrationPath(4)).toBe("/events/4/registrations/me");
     expect(unregisterFromEventPath(4)).toBe("/events/4/registrations/me");
+    expect(
+      markAdminRegistrationPaidPath(4, "11111111-1111-4111-8111-111111111111"),
+    ).toBe(
+      "/events/4/registrations/11111111-1111-4111-8111-111111111111/paid",
+    );
   });
 
   test("builds category and me paths", () => {

@@ -44,6 +44,10 @@ export default function RegistrationsPage() {
   const [detail, setDetail] = useState<AdminRegistration | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [markingPaidUserId, setMarkingPaidUserId] = useState<string | null>(
+    null,
+  );
+  const [paidError, setPaidError] = useState<string | null>(null);
   const [pendingRemove, setPendingRemove] = useState<AdminRegistration | null>(
     null,
   );
@@ -89,7 +93,20 @@ export default function RegistrationsPage() {
     setPendingRemove(null);
     setRemoveError(null);
     setStatusMessage(null);
+    setPaidError(null);
+    setMarkingPaidUserId(null);
   }, [eventId]);
+
+  useEffect(() => {
+    if (detail == null || eventId == null || detail.event_id !== eventId) {
+      return;
+    }
+
+    const next = registrations.find((row) => row.id === detail.id);
+    if (next && next !== detail) {
+      setDetail(next);
+    }
+  }, [registrations, detail, eventId]);
 
   function onSelectEvent(nextId: string) {
     if (!nextId) {
@@ -140,6 +157,21 @@ export default function RegistrationsPage() {
     setStatusMessage("Inscripción actualizada.");
     setDetail(null);
     return null;
+  }
+
+  async function handleMarkPaid(registration: AdminRegistration) {
+    if (markingPaidUserId || registration.has_paid === true) {
+      return;
+    }
+
+    setMarkingPaidUserId(registration.user_id);
+    setPaidError(null);
+    const error = await list.markPaid(registration.user_id);
+    setMarkingPaidUserId(null);
+
+    if (error) {
+      setPaidError(error);
+    }
   }
 
   async function handleRemove() {
@@ -279,6 +311,15 @@ export default function RegistrationsPage() {
             </div>
           ) : null}
 
+          {paidError ? (
+            <p
+              className={shared.error}
+              role="alert"
+            >
+              {paidError}
+            </p>
+          ) : null}
+
           <section className={styles.card}>
             <div className={styles.rosterHead}>
               <div>
@@ -321,6 +362,7 @@ export default function RegistrationsPage() {
                       <th>Jugador</th>
                       <th>Correo</th>
                       <th>Estado</th>
+                      <th>Pago</th>
                       <th>Lista de espera</th>
                       <th>Inscripción</th>
                       <th>Acciones</th>
@@ -352,6 +394,11 @@ export default function RegistrationsPage() {
                             </span>
                           </td>
                           <td>
+                            {registration.has_paid === true
+                              ? "Pagado"
+                              : "Pendiente"}
+                          </td>
+                          <td>
                             {confirmed
                               ? "—"
                               : registration.waitlist_position ?? "—"}
@@ -361,6 +408,21 @@ export default function RegistrationsPage() {
                           </td>
                           <td>
                             <div className={styles.rowActions}>
+                              {registration.has_paid !== true ? (
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  loading={
+                                    markingPaidUserId === registration.user_id
+                                  }
+                                  disabled={markingPaidUserId != null}
+                                  onClick={() =>
+                                    void handleMarkPaid(registration)
+                                  }
+                                >
+                                  Marcar como pagado
+                                </Button>
+                              ) : null}
                               <Button
                                 size="sm"
                                 variant="secondary"

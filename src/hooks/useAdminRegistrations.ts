@@ -23,6 +23,7 @@ import {
   createAdminRegistrationPath,
   updateAdminRegistrationPath,
   deleteAdminRegistrationPath,
+  markAdminRegistrationPaidPath,
 } from "../services/eventsApi";
 import { formatConnectionError } from "../utils/apiError";
 
@@ -328,11 +329,34 @@ export function useAdminRegistrations(eventId: number | null) {
     [connection, load],
   );
 
+  const markPaid = useCallback(
+    async (userId: string): Promise<string | null> => {
+      if (eventId === null) {
+        return "Elegí un evento.";
+      }
+
+      const result = await connection<ApiResponse<AdminRegistration>>({
+        method: "PATCH",
+        url: markAdminRegistrationPaidPath(eventId, userId),
+        body: {},
+      });
+
+      if (isConnectionError(result)) {
+        return formatConnectionError(result);
+      }
+
+      await load();
+      return null;
+    },
+    [connection, eventId, load],
+  );
+
   return {
     state,
     reload: load,
     create,
     update,
     remove,
+    markPaid,
   };
 }
