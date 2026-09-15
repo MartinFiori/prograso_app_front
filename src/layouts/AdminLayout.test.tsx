@@ -29,13 +29,21 @@ function renderLayout(path = "/admin/categorias") {
 describe("AdminLayout", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    document.body.style.overflow = "";
   });
 
-  test("renders the seven backoffice tabs and no Exercises tab", () => {
-    renderLayout();
+  test("names the admin area and current destination with seven unchanged tabs", () => {
+    renderLayout("/admin/eventos");
 
     const nav = screen.getByRole("navigation", { name: "Backoffice" });
     expect(nav).toBeInTheDocument();
+    expect(
+      screen.getByRole("complementary", { name: "Administración" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Administración")).toHaveLength(2);
+    expect(screen.getAllByText("Eventos")).toHaveLength(3);
+    expect(screen.getByRole("button", { name: "Menú" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cerrar" })).toBeInTheDocument();
 
     for (const tab of ADMIN_TABS) {
       expect(screen.getByRole("link", { name: tab.label })).toBeInTheDocument();
@@ -60,6 +68,7 @@ describe("AdminLayout", () => {
 
   test("opens the drawer from the menu button and closes it with Escape", async () => {
     renderLayout();
+    document.body.style.overflow = "auto";
 
     const menuButton = screen.getByRole("button", { name: "Menú" });
     expect(menuButton).toHaveAttribute("aria-expanded", "false");
@@ -68,10 +77,12 @@ describe("AdminLayout", () => {
     await userEvent.click(menuButton);
 
     expect(menuButton).toHaveAttribute("aria-expanded", "true");
+    expect(document.body).toHaveStyle({ overflow: "hidden" });
 
     await userEvent.keyboard("{Escape}");
 
     expect(menuButton).toHaveAttribute("aria-expanded", "false");
+    expect(document.body).toHaveStyle({ overflow: "auto" });
     expect(menuButton).toHaveFocus();
   });
 
@@ -91,6 +102,7 @@ describe("AdminLayout", () => {
 
   test("closes the drawer after navigating to another section", async () => {
     renderLayout();
+    document.body.style.overflow = "auto";
 
     const menuButton = screen.getByRole("button", { name: "Menú" });
     await userEvent.click(menuButton);
@@ -98,6 +110,7 @@ describe("AdminLayout", () => {
 
     expect(screen.getByText("eventos panel")).toBeInTheDocument();
     expect(menuButton).toHaveAttribute("aria-expanded", "false");
+    expect(document.body).toHaveStyle({ overflow: "auto" });
   });
 
   test("persists the collapsed preference and keeps accessible link names", async () => {

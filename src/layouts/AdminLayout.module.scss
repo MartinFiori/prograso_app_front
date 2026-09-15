@@ -24,6 +24,13 @@
   border-bottom: var(--border-width) solid var(--color-border);
   background: var(--color-sidebar-background);
 
+  @include screen-max($breakpoint-lg) {
+    min-height: 4rem;
+    border-bottom-color: var(--color-court-line);
+    background: var(--color-court-dark);
+    box-shadow: var(--shadow-sm);
+  }
+
   @include screen-min($breakpoint-md) {
     padding-inline: var(--page-padding-tablet);
   }
@@ -31,6 +38,31 @@
   @include screen-min($breakpoint-lg) {
     display: none;
   }
+}
+
+.bar_context {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: var(--line-height-tight);
+
+  @include screen-min($breakpoint-lg) {
+    display: none;
+  }
+}
+
+.area_label {
+  color: var(--color-court-line);
+  font-size: var(--font-size-xs);
+}
+
+.current_label {
+  overflow: hidden;
+  color: var(--gray-0);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .menu_button,
@@ -56,6 +88,22 @@
   &:hover {
     color: var(--color-primary);
     background: var(--color-primary-soft);
+  }
+}
+
+.menu_button {
+  @include screen-max($breakpoint-lg) {
+    border-color: var(--color-court-line);
+    color: var(--gray-0);
+
+    &:hover {
+      color: var(--gray-0);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px var(--color-padel-ball);
+    }
   }
 }
 
@@ -101,6 +149,15 @@
   /* Cerrado fuera de pantalla no debe recibir foco de teclado. */
   visibility: hidden;
 
+  @include screen-max($breakpoint-lg) {
+    width: min(21rem, calc(100% - var(--spacing-4)));
+    max-width: none;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-3) var(--spacing-6);
+    border-right: 0;
+    background: var(--color-court-dark);
+  }
+
   &.open {
     transform: translateX(0);
     visibility: visible;
@@ -130,9 +187,54 @@
   justify-content: flex-end;
   gap: var(--spacing-2);
   min-height: var(--touch-target-min);
+
+  @include screen-max($breakpoint-lg) {
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0 var(--spacing-1) var(--spacing-4);
+    border-bottom: var(--border-width) solid var(--color-court-line);
+  }
+}
+
+.drawer_context {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-top: var(--spacing-1);
+
+  @include screen-min($breakpoint-lg) {
+    display: none;
+  }
+}
+
+.drawer_title {
+  color: var(--gray-0);
+  font-size: var(--font-size-lg);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.drawer_current {
+  margin-top: var(--spacing-1);
+  color: var(--color-court-line);
+  font-size: var(--font-size-sm);
 }
 
 .drawer_close {
+  @include screen-max($breakpoint-lg) {
+    flex-shrink: 0;
+    border-color: var(--color-court-line);
+    color: var(--gray-0);
+
+    &:hover {
+      color: var(--gray-0);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px var(--color-padel-ball);
+    }
+  }
+
   @include screen-min($breakpoint-lg) {
     display: none;
   }
@@ -148,6 +250,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-2);
+
+  @include screen-max($breakpoint-lg) {
+    gap: var(--spacing-1);
+  }
 }
 
 .tab {
@@ -174,6 +280,37 @@
     background: var(--color-primary);
     box-shadow: inset 3px 0 0 var(--color-accent);
   }
+
+  @include screen-max($breakpoint-lg) {
+    align-items: flex-start;
+    min-height: var(--touch-target-min);
+    padding: var(--spacing-3);
+    border-radius: var(--radius-sm);
+    color: var(--color-court-line);
+    font-size: var(--font-size-md);
+
+    &:hover {
+      color: var(--gray-0);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px var(--color-padel-ball);
+    }
+
+    &.active {
+      color: var(--gray-0);
+      background: rgba(255, 255, 255, 0.14);
+      box-shadow: inset 4px 0 0 var(--color-padel-ball);
+      font-weight: var(--font-weight-bold);
+
+      .tab_short {
+        border-color: var(--color-padel-ball);
+        background: var(--color-padel-ball);
+        color: var(--color-accent-contrast);
+      }
+    }
+  }
 }
 
 .tab_short {
@@ -188,10 +325,26 @@
   background: var(--color-primary-soft);
   color: inherit;
   font-size: var(--font-size-sm);
+
+  @include screen-max($breakpoint-lg) {
+    border: var(--border-width) solid var(--color-court-line);
+    background: transparent;
+    color: var(--gray-0);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+  }
 }
 
 .tab_label {
   @include truncate;
+
+  @include screen-max($breakpoint-lg) {
+    overflow: visible;
+    padding-block: var(--spacing-1);
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 
 /* El rail colapsado solo existe en escritorio: el drawer siempre

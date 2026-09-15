@@ -5,6 +5,7 @@ import styles from "./AdminLayout.module.scss";
 
 const COLLAPSED_STORAGE_KEY = "admin-sidebar-collapsed";
 const SIDEBAR_ID = "admin-sidebar";
+const SIDEBAR_TITLE_ID = "admin-sidebar-title";
 
 export const ADMIN_TABS = [
   { to: "/admin/categorias", label: "Categorías", short: "CA" },
@@ -33,6 +34,10 @@ export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const currentTab = ADMIN_TABS.find(
+    (tab) => pathname === tab.to || pathname.startsWith(`${tab.to}/`),
+  );
+  const currentLabel = currentTab?.label ?? "Administración";
 
   useEffect(() => {
     try {
@@ -92,6 +97,11 @@ export default function AdminLayout() {
         >
           Menú
         </button>
+
+        <div className={styles.bar_context}>
+          <span className={styles.area_label}>Administración</span>
+          <span className={styles.current_label}>{currentLabel}</span>
+        </div>
       </div>
 
       {drawerOpen ? (
@@ -106,8 +116,19 @@ export default function AdminLayout() {
       <aside
         id={SIDEBAR_ID}
         className={sidebarClassName}
+        aria-labelledby={SIDEBAR_TITLE_ID}
       >
         <div className={styles.sidebar_header}>
+          <div className={styles.drawer_context}>
+            <h2
+              id={SIDEBAR_TITLE_ID}
+              className={styles.drawer_title}
+            >
+              Administración
+            </h2>
+            <span className={styles.drawer_current}>{currentLabel}</span>
+          </div>
+
           <button
             type="button"
             className={styles.drawer_close}
