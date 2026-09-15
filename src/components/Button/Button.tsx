@@ -18,6 +18,7 @@ export type ButtonProps = {
   loading?: boolean;
   loadingText?: string;
   fullWidth?: boolean;
+  iconOnly?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
@@ -29,6 +30,7 @@ export function Button({
   loading = false,
   loadingText,
   fullWidth = false,
+  iconOnly = false,
   leftIcon,
   rightIcon,
   disabled,
@@ -41,6 +43,7 @@ export function Button({
     styles[variant],
     styles[size],
     fullWidth ? styles.fullWidth : "",
+    iconOnly ? styles.iconOnly : "",
     loading ? styles.loading : "",
     className,
   ]
@@ -62,7 +65,7 @@ export function Button({
             aria-hidden="true"
           />
 
-          <span>{loadingText ?? children}</span>
+          {!iconOnly ? <span>{loadingText ?? children}</span> : null}
         </>
       ) : (
         <>
@@ -75,7 +78,9 @@ export function Button({
             </span>
           )}
 
-          <span>{children}</span>
+          <span className={iconOnly ? styles.iconOnlyContent : undefined}>
+            {children}
+          </span>
 
           {rightIcon && (
             <span

@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { FiEye } from "react-icons/fi";
 
 import { Button } from "../../../components/Button/Button";
 import {
@@ -139,9 +140,12 @@ export default function AuditLogsPage() {
                           <Button
                             size="sm"
                             variant="secondary"
+                            iconOnly
+                            aria-label="Ver detalles"
+                            title="Ver detalles"
                             onClick={() => setDetail(log)}
                           >
-                            Ver detalles
+                            <FiEye aria-hidden="true" />
                           </Button>
                         </div>
                       </td>

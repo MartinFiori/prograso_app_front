@@ -1,4 +1,5 @@
 import { Button } from "../../components/Button/Button";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { EVENTS_PAGE_LIMIT } from "../../services/eventsApi";
 import styles from "./adminShared.module.scss";
 
@@ -54,17 +55,23 @@ export function ResourcePager({
       <div className={styles.actions}>
         <Button
           variant="secondary"
+          iconOnly
+          aria-label="Anterior"
+          title="Anterior"
           disabled={disabled || page <= 1}
           onClick={() => onPageChange(Math.max(1, page - 1))}
         >
-          Anterior
+          <FiChevronLeft aria-hidden="true" />
         </Button>
         <Button
           variant="secondary"
+          iconOnly
+          aria-label="Siguiente"
+          title="Siguiente"
           disabled={disabled || page >= pages}
           onClick={() => onPageChange(page + 1)}
         >
-          Siguiente
+          <FiChevronRight aria-hidden="true" />
         </Button>
       </div>
     </div>

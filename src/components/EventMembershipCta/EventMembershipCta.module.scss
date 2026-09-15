@@ -18,3 +18,59 @@
   margin: 0;
   color: var(--color-error);
 }
+
+.searchForm {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.searchRow {
+  display: flex;
+  gap: var(--spacing-2);
+
+  input {
+    flex: 1;
+    min-width: 0;
+    min-height: var(--input-height-md);
+    padding: var(--spacing-3) var(--spacing-4);
+    border: var(--border-width) solid var(--color-input-border);
+    border-radius: var(--radius-md);
+    background: var(--color-input-background);
+    color: var(--color-text);
+    font: inherit;
+  }
+}
+
+.results {
+  display: grid;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+  padding: var(--spacing-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  text-align: left;
+}
+
+.playerSelected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.modalActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-5);
+}

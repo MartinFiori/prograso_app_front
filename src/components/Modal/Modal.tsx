@@ -5,6 +5,7 @@ import {
   useRef,
 } from "react";
 import { createPortal } from "react-dom";
+import { FiX } from "react-icons/fi";
 
 import { Button } from "../Button/Button";
 import styles from "./Modal.module.scss";
@@ -120,11 +121,12 @@ export function Modal({
           <Button
             variant="ghost"
             size="sm"
+            iconOnly
             onClick={onClose}
             disabled={busy}
             aria-label="Cerrar"
           >
-            Cerrar
+            <FiX aria-hidden="true" />
           </Button>
         </header>
         <div className={styles.body}>{children}</div>

@@ -15,14 +15,6 @@ export function formatEventDateTime(iso: string): string {
   }).format(date);
 }
 
-export function formatRegistrationDeadline(iso: string | null): string {
-  if (iso === null) {
-    return "Sin fecha límite";
-  }
-
-  return formatEventDateTime(iso);
-}
-
 export function formatCapacity(capacity: number): string {
   return `Cupo máximo: ${capacity}`;
 }

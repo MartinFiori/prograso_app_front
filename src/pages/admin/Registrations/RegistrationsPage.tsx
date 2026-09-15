@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { FiEye, FiPlus, FiTrash2 } from "react-icons/fi";
 
 import { Button } from "../../../components/Button/Button";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
@@ -208,6 +209,7 @@ export default function RegistrationsPage() {
           </p>
         </div>
         <Button
+          leftIcon={<FiPlus />}
           disabled={eventId == null}
           onClick={() => {
             if (eventId != null) {
@@ -426,16 +428,22 @@ export default function RegistrationsPage() {
                               <Button
                                 size="sm"
                                 variant="secondary"
+                                iconOnly
+                                aria-label="Ver detalles"
+                                title="Ver detalles"
                                 onClick={() => setDetail(registration)}
                               >
-                                Ver detalles
+                                <FiEye aria-hidden="true" />
                               </Button>
                               <Button
                                 size="sm"
                                 variant="ghost"
+                                iconOnly
+                                aria-label="Quitar del evento"
+                                title="Quitar del evento"
                                 onClick={() => setPendingRemove(registration)}
                               >
-                                Quitar del evento
+                                <FiTrash2 aria-hidden="true" />
                               </Button>
                             </div>
                           </td>

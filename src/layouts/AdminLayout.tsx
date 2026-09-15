@@ -1,5 +1,17 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import {
+  FiCalendar,
+  FiChevronLeft,
+  FiChevronRight,
+  FiClipboard,
+  FiFileText,
+  FiGrid,
+  FiList,
+  FiMenu,
+  FiUsers,
+  FiX,
+} from "react-icons/fi";
 
 import styles from "./AdminLayout.module.scss";
 
@@ -8,17 +20,17 @@ const SIDEBAR_ID = "admin-sidebar";
 const SIDEBAR_TITLE_ID = "admin-sidebar-title";
 
 export const ADMIN_TABS = [
-  { to: "/admin/categorias", label: "Categorías", short: "CA" },
-  { to: "/admin/eventos", label: "Eventos", short: "EV" },
-  { to: "/admin/inscripciones", label: "Inscripciones", short: "IN" },
-  { to: "/admin/usuarios", label: "Usuarios", short: "US" },
-  { to: "/admin/estados-evento", label: "Estados de evento", short: "EE" },
+  { to: "/admin/categorias", label: "Categorías", icon: FiGrid },
+  { to: "/admin/eventos", label: "Eventos", icon: FiCalendar },
+  { to: "/admin/inscripciones", label: "Inscripciones", icon: FiClipboard },
+  { to: "/admin/usuarios", label: "Usuarios", icon: FiUsers },
+  { to: "/admin/estados-evento", label: "Estados de evento", icon: FiList },
   {
     to: "/admin/estados-inscripcion",
     label: "Estados de inscripción",
-    short: "EI",
+    icon: FiFileText,
   },
-  { to: "/admin/auditoria", label: "Auditoría", short: "AU" },
+  { to: "/admin/auditoria", label: "Auditoría", icon: FiFileText },
 ] as const;
 
 function readCollapsed(): boolean {
@@ -93,9 +105,10 @@ export default function AdminLayout() {
           className={styles.menu_button}
           aria-expanded={drawerOpen}
           aria-controls={SIDEBAR_ID}
+          aria-label="Menú"
           onClick={() => setDrawerOpen((open) => !open)}
         >
-          Menú
+          <FiMenu aria-hidden="true" />
         </button>
 
         <div className={styles.bar_context}>
@@ -131,10 +144,11 @@ export default function AdminLayout() {
 
           <button
             type="button"
-            className={styles.drawer_close}
+          className={styles.drawer_close}
+          aria-label="Cerrar panel lateral"
             onClick={() => setDrawerOpen(false)}
           >
-            Cerrar
+            <FiX aria-hidden="true" />
           </button>
 
           <button
@@ -144,7 +158,9 @@ export default function AdminLayout() {
             aria-pressed={collapsed}
             onClick={() => setCollapsed((value) => !value)}
           >
-            <span aria-hidden="true">{collapsed ? "»" : "«"}</span>
+            <span aria-hidden="true">
+              {collapsed ? <FiChevronRight /> : <FiChevronLeft />}
+            </span>
           </button>
         </div>
 
@@ -161,11 +177,8 @@ export default function AdminLayout() {
                 isActive ? `${styles.tab} ${styles.active}` : styles.tab
               }
             >
-              <span
-                className={styles.tab_short}
-                aria-hidden="true"
-              >
-                {tab.short}
+              <span className={styles.tab_short} aria-hidden="true">
+                <tab.icon />
               </span>
 
               <span className={styles.tab_label}>{tab.label}</span>

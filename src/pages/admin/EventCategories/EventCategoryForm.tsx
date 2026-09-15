@@ -31,6 +31,8 @@ export default function EventCategoryForm({
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [participantsPerRegistration, setParticipantsPerRegistration] =
+    useState<1 | 2>(1);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
@@ -46,6 +48,9 @@ export default function EventCategoryForm({
     setName(detail.state.category.name);
     setDescription(detail.state.category.description ?? "");
     setExistingImageUrl(detail.state.category.image_url);
+    setParticipantsPerRegistration(
+      detail.state.category.participants_per_registration ?? 1,
+    );
   }, [mode, detail.state]);
 
   useEffect(() => {
@@ -90,6 +95,10 @@ export default function EventCategoryForm({
 
     const form = new FormData();
     form.append("name", trimmedName);
+    form.append(
+      "participants_per_registration",
+      String(participantsPerRegistration),
+    );
 
     if (description.trim()) {
       form.append("description", description.trim());
@@ -185,6 +194,36 @@ export default function EventCategoryForm({
           onChange={(changeEvent) => setDescription(changeEvent.target.value)}
         />
       </label>
+
+      <div className={styles.field}>
+        <label
+          className={styles.label}
+          htmlFor="participants-per-registration"
+        >
+          Modalidad de inscripción
+        </label>
+        <select
+          id="participants-per-registration"
+          className={styles.input}
+          name="participants_per_registration"
+          aria-describedby="participants-per-registration-hint"
+          value={participantsPerRegistration}
+          onChange={(changeEvent) =>
+            setParticipantsPerRegistration(
+              Number(changeEvent.target.value) === 2 ? 2 : 1,
+            )
+          }
+        >
+          <option value={1}>Individual</option>
+          <option value={2}>En pareja</option>
+        </select>
+        <span
+          id="participants-per-registration-hint"
+          className={styles.hint}
+        >
+          En pareja, un jugador elige a otro usuario registrado y ambos ocupan cupo.
+        </span>
+      </div>
 
       <label className={styles.field}>
         <span className={styles.label}>Imagen</span>
