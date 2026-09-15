@@ -235,11 +235,14 @@ describe("EventDetail", () => {
     expect(screen.getByText("1 de 16")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Lista de espera" })).toBeInTheDocument();
     expect(screen.getByText("Luis Perez")).toBeInTheDocument();
-    expect(screen.getByText("Posición en espera: 1")).toBeInTheDocument();
 
     const confirmedRow = screen.getByText("Ana Gomez").closest("li");
     expect(confirmedRow).not.toHaveTextContent("Posición en espera");
     expect(confirmedRow).toHaveTextContent("1");
+
+    const waitlistedRow = screen.getByText("Luis Perez").closest("li");
+    expect(waitlistedRow).toHaveTextContent("1");
+    expect(waitlistedRow).not.toHaveTextContent("Posición en espera");
   });
 
   test("shows NotFound for event_not_found", async () => {

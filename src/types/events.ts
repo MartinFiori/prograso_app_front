@@ -1,3 +1,5 @@
+import type { ProfileCategory } from "../constants/profileFields";
+
 export type EventCategoryEmbed = {
   id: number;
   name: string;
@@ -51,6 +53,7 @@ export type PublicProfileEmbed = {
   id: string;
   name: string;
   avatar_url: string | null;
+  category: ProfileCategory | null;
 };
 
 export type EventRegistrationWithProfile = {
