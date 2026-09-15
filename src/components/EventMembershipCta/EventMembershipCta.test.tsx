@@ -67,4 +67,35 @@ describe("EventMembershipCta pair registration", () => {
       );
     });
   });
+
+  test("shows no-results feedback only after submitting a search", async () => {
+    connection.mockResolvedValueOnce({
+      status: "success",
+      statusCode: 200,
+      description: "OK",
+      data: [],
+    });
+
+    render(
+      <EventMembershipCta
+        eventId={9}
+        participantsPerRegistration={2}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Anotarme con compañero" }),
+    );
+    await userEvent.type(screen.getByLabelText("Buscar por nombre"), "Marina");
+
+    expect(
+      screen.queryByText("No encontramos jugadores con ese nombre."),
+    ).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Buscar" }));
+
+    expect(
+      await screen.findByText("No encontramos jugadores con ese nombre."),
+    ).toBeInTheDocument();
+  });
 });

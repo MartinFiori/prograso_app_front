@@ -32,6 +32,7 @@ export function EventMembershipCta({
   const [results, setResults] = useState<PlayerSearchResult[]>([]);
   const [selected, setSelected] = useState<PlayerSearchResult | null>(null);
   const [searching, setSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const closePairModal = useCallback(() => setPairModalOpen(false), []);
 
@@ -52,6 +53,7 @@ export function EventMembershipCta({
     }
 
     setSearching(true);
+    setHasSearched(false);
     setSearchError(null);
     setSelected(null);
     const result = await connection<ApiResponse<PlayerSearchResult[]>>({
@@ -66,6 +68,7 @@ export function EventMembershipCta({
     }
 
     setResults(result.data ?? []);
+    setHasSearched(true);
   }
 
   async function handleLeave() {
@@ -177,7 +180,10 @@ export function EventMembershipCta({
             <input
               id="companion-search"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setHasSearched(false);
+              }}
               placeholder="Nombre del jugador"
               minLength={2}
             />
@@ -188,7 +194,7 @@ export function EventMembershipCta({
         </form>
 
         {searchError ? <p className={styles.error}>{searchError}</p> : null}
-        {!searching && query.trim().length >= 2 && results.length === 0 && !searchError ? (
+        {hasSearched && results.length === 0 && !searchError ? (
           <p>No encontramos jugadores con ese nombre.</p>
         ) : null}
 
