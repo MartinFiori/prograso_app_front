@@ -76,7 +76,7 @@ export function useEventMembership(eventId: number | null) {
     void hydrate();
   }, [hydrate]);
 
-  const join = useCallback(async (): Promise<boolean> => {
+  const join = useCallback(async (companionUserId?: string): Promise<boolean> => {
     if (eventId === null || inFlight) {
       return false;
     }
@@ -91,7 +91,7 @@ export function useEventMembership(eventId: number | null) {
     const result = await connection<ApiResponse<UserEventRegistration>>({
       method: "POST",
       url: registerForEventPath(eventId),
-      body: {},
+      body: companionUserId ? { companion_user_id: companionUserId } : {},
     });
 
     if (isConnectionError(result)) {

@@ -11,9 +11,9 @@ export type CreateEventBody = {
   category_id: number;
   title: string;
   starts_at: string;
+  end_at: string;
   capacity: number;
   price: number;
-  registration_deadline?: string | null;
   status_code?: string;
 };
 
@@ -21,7 +21,7 @@ export type UpdateEventBody = {
   category_id?: number;
   title?: string;
   starts_at?: string;
-  registration_deadline?: string | null;
+  end_at?: string;
   capacity?: number;
   price?: number;
   status_code?: string;
@@ -38,6 +38,7 @@ export type AdminRegistration = {
   id: number;
   event_id: number;
   user_id: string;
+  registration_group_id?: number | null;
   status_code: string;
   waitlist_position: number | null;
   has_paid?: boolean;

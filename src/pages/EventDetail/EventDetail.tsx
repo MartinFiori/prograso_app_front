@@ -10,7 +10,6 @@ import {
   formatCapacity,
   formatEventDateTime,
   formatPrice,
-  formatRegistrationDeadline,
   statusLabel,
 } from "../../utils/eventDisplay";
 import {
@@ -117,15 +116,9 @@ export default function EventDetail() {
           </dd>
         </div>
         <div>
-          <dt>Inscripción hasta</dt>
+          <dt>Finalización</dt>
           <dd>
-            {event.registration_deadline ? (
-              <time dateTime={event.registration_deadline}>
-                {formatRegistrationDeadline(event.registration_deadline)}
-              </time>
-            ) : (
-              formatRegistrationDeadline(null)
-            )}
+            <time dateTime={event.end_at}>{formatEventDateTime(event.end_at)}</time>
           </dd>
         </div>
         <div>
@@ -155,6 +148,9 @@ export default function EventDetail() {
 
         <EventMembershipCta
           eventId={event.id}
+          participantsPerRegistration={
+            event.category.participants_per_registration
+          }
           onMembershipChanged={() => void reloadRegistrations()}
         />
 

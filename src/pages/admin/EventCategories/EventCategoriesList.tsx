@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FiEdit2, FiEye, FiPlus, FiTrash2 } from "react-icons/fi";
 
 import { Avatar } from "../../../components/Avatar/Avatar";
 import { Button } from "../../../components/Button/Button";
@@ -48,7 +49,13 @@ export default function EventCategoriesList() {
     <main className={styles.page}>
       <header className={styles.header}>
         <h1>Categorías</h1>
-        <Button onClick={() => setCreateOpen(true)}>+ Crear categoría</Button>
+        <Button
+          leftIcon={<FiPlus />}
+          aria-label="+ Crear categoría"
+          onClick={() => setCreateOpen(true)}
+        >
+          Crear categoría
+        </Button>
       </header>
 
       {statusMessage ? (
@@ -92,6 +99,7 @@ export default function EventCategoriesList() {
                   <th>Imagen</th>
                   <th>Nombre</th>
                   <th>Descripción</th>
+                  <th>Inscripción</th>
                   <th>Activa</th>
                   <th>Acciones</th>
                 </tr>
@@ -107,6 +115,11 @@ export default function EventCategoriesList() {
                     </td>
                     <td>{category.name}</td>
                     <td>{emptyDisplay(category.description)}</td>
+                    <td>
+                      {category.participants_per_registration === 2
+                        ? "En pareja"
+                        : "Individual"}
+                    </td>
                     <td>{category.is_active ? "sí" : "no"}</td>
                     <td>
                       {pendingId === category.id ? (
@@ -136,23 +149,32 @@ export default function EventCategoriesList() {
                           <Button
                             size="sm"
                             variant="secondary"
+                            iconOnly
+                            aria-label="Ver detalles"
+                            title="Ver detalles"
                             onClick={() => setDetail(category)}
                           >
-                            Ver detalles
+                            <FiEye aria-hidden="true" />
                           </Button>
                           <Button
                             size="sm"
                             variant="secondary"
+                            iconOnly
+                            aria-label="Editar"
+                            title="Editar"
                             onClick={() => setEditId(category.id)}
                           >
-                            Editar
+                            <FiEdit2 aria-hidden="true" />
                           </Button>
                           <Button
                             size="sm"
                             variant="danger"
+                            iconOnly
+                            aria-label="Eliminar"
+                            title="Eliminar"
                             onClick={() => setPendingId(category.id)}
                           >
-                            Eliminar
+                            <FiTrash2 aria-hidden="true" />
                           </Button>
                         </div>
                       )}
@@ -215,6 +237,13 @@ export default function EventCategoriesList() {
               { label: "Id", value: emptyDisplay(detail.id) },
               { label: "Nombre", value: detail.name },
               { label: "Descripción", value: emptyDisplay(detail.description) },
+              {
+                label: "Inscripción",
+                value:
+                  detail.participants_per_registration === 2
+                    ? "En pareja"
+                    : "Individual",
+              },
               { label: "Imagen", value: emptyDisplay(detail.image_url) },
               { label: "Activa", value: detail.is_active ? "sí" : "no" },
               {

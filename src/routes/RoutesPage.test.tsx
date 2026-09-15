@@ -98,7 +98,7 @@ describe("RoutesPage public redirects", () => {
               category_id: 2,
               title: "Borrador interno",
               starts_at: "2026-09-20T21:00:00.000Z",
-              registration_deadline: null,
+              end_at: "2026-09-20T23:00:00.000Z",
               capacity: 16,
               price: 15000,
               status_code: "draft",

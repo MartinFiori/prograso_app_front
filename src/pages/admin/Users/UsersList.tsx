@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { FiEye, FiPlus, FiSettings } from "react-icons/fi";
 
 import { Button } from "../../../components/Button/Button";
 import {
@@ -98,12 +99,14 @@ export default function UsersList() {
       <header className={styles.header}>
         <h1>Usuarios</h1>
         <Button
+          leftIcon={<FiPlus />}
+          aria-label="+ Crear usuario"
           onClick={() => {
             resetInvite();
             setCreateOpen(true);
           }}
         >
-          + Crear usuario
+          Crear usuario
         </Button>
       </header>
 
@@ -200,16 +203,22 @@ export default function UsersList() {
                           <Button
                             size="sm"
                             variant="secondary"
+                            iconOnly
+                            aria-label="Ver detalles"
+                            title="Ver detalles"
                             onClick={() => setDetail(user)}
                           >
-                            Ver detalles
+                            <FiEye aria-hidden="true" />
                           </Button>
                           <Button
                             size="sm"
                             variant="secondary"
+                            iconOnly
+                            aria-label="Administrar"
+                            title="Administrar"
                             onClick={() => setAdminUser(user)}
                           >
-                            Administrar
+                            <FiSettings aria-hidden="true" />
                           </Button>
                         </div>
                       </td>

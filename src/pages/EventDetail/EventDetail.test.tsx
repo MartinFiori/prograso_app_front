@@ -49,7 +49,7 @@ const publicEvent = {
   category_id: 2,
   title: "Encuentro del viernes",
   starts_at: "2026-09-04T21:00:00.000Z",
-  registration_deadline: "2026-09-04T18:00:00.000Z",
+  end_at: "2026-09-04T23:00:00.000Z",
   capacity: 16,
   price: 15000,
   status_code: "open",
@@ -490,7 +490,7 @@ describe("EventDetail", () => {
   test.each([
     ["event_registration_forbidden", 403],
     ["event_not_open", 409],
-    ["registration_deadline_expired", 409],
+    ["event_already_started", 409],
   ] as const)(
     "surfaces %s from join POST without retrying POST",
     async (errorCode, status) => {

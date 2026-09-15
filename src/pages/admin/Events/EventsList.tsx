@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FiEdit2, FiEye, FiPlus, FiTrash2 } from "react-icons/fi";
 
 import { Button } from "../../../components/Button/Button";
 import {
@@ -51,7 +52,13 @@ export default function EventsList() {
     <main className={styles.page}>
       <header className={styles.header}>
         <h1>Eventos</h1>
-        <Button onClick={() => setCreateOpen(true)}>+ Crear evento</Button>
+        <Button
+          leftIcon={<FiPlus />}
+          aria-label="+ Crear evento"
+          onClick={() => setCreateOpen(true)}
+        >
+          Crear evento
+        </Button>
       </header>
 
       {statusMessage ? (
@@ -137,24 +144,33 @@ export default function EventsList() {
                             <Button
                               size="sm"
                               variant="secondary"
+                              iconOnly
+                              aria-label="Ver detalles"
+                              title="Ver detalles"
                               onClick={() => setDetail(event)}
                             >
-                              Ver detalles
+                              <FiEye aria-hidden="true" />
                             </Button>
                             <Button
                               size="sm"
                               variant="secondary"
+                              iconOnly
+                              aria-label="Editar"
+                              title="Editar"
                               onClick={() => setEditId(event.id)}
                             >
-                              Editar
+                              <FiEdit2 aria-hidden="true" />
                             </Button>
                             <Button
                               size="sm"
                               variant="danger"
+                              iconOnly
+                              aria-label="Cancelar evento"
+                              title="Cancelar evento"
                               disabled={event.status_code === "cancelled"}
                               onClick={() => setPendingId(event.id)}
                             >
-                              Cancelar evento
+                              <FiTrash2 aria-hidden="true" />
                             </Button>
                           </div>
                         )}
@@ -235,12 +251,8 @@ export default function EventsList() {
               { label: "Categoría", value: emptyDisplay(detail.category?.name) },
               { label: "Inicio", value: formatEventDateTime(detail.starts_at) },
               {
-                label: "Límite",
-                value: emptyDisplay(
-                  detail.registration_deadline
-                    ? formatEventDateTime(detail.registration_deadline)
-                    : null,
-                ),
+                label: "Fin",
+                value: formatEventDateTime(detail.end_at),
               },
               { label: "Cupo", value: emptyDisplay(detail.capacity) },
               { label: "Precio", value: formatPrice(detail.price) },

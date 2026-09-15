@@ -38,7 +38,7 @@ export default function EventForm({
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [startsAt, setStartsAt] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [endAt, setEndAt] = useState("");
   const [capacity, setCapacity] = useState("16");
   const [price, setPrice] = useState("");
   const [statusCode, setStatusCode] = useState("");
@@ -54,7 +54,7 @@ export default function EventForm({
     setTitle(event.title);
     setCategoryId(String(event.category_id));
     setStartsAt(isoToDatetimeLocal(event.starts_at));
-    setDeadline(isoToDatetimeLocal(event.registration_deadline));
+    setEndAt(isoToDatetimeLocal(event.end_at));
     setCapacity(String(event.capacity));
     setPrice(String(event.price));
     setStatusCode(event.status_code);
@@ -67,33 +67,34 @@ export default function EventForm({
     const parsedCapacity = Number(capacity);
     const parsedPrice = Number(price);
     const startsAtIso = datetimeLocalToIso(startsAt);
+    const endAtIso = datetimeLocalToIso(endAt);
 
     if (
       !trimmedTitle ||
       !parsedCategory ||
       !startsAtIso ||
+      !endAtIso ||
       parsedCapacity < 1 ||
       !Number.isInteger(parsedPrice) ||
       parsedPrice < 1
     ) {
-      setError("Completá título, categoría, inicio, cupo y precio (entero mayor a 0).");
+      setError("Completá título, categoría, inicio, fin, cupo y precio (entero mayor a 0).");
       return;
     }
 
-    const deadlineIso = datetimeLocalToIso(deadline);
+    if (Date.parse(endAtIso) <= Date.parse(startsAtIso)) {
+      setError("La finalización debe ser posterior al inicio.");
+      return;
+    }
+
     const body: CreateEventBody = {
       category_id: parsedCategory,
       title: trimmedTitle,
       starts_at: startsAtIso,
+      end_at: endAtIso,
       capacity: parsedCapacity,
       price: parsedPrice,
     };
-
-    if (deadlineIso) {
-      body.registration_deadline = deadlineIso;
-    } else if (mode === "edit") {
-      body.registration_deadline = null;
-    }
 
     if (statusCode) {
       body.status_code = statusCode;
@@ -206,13 +207,14 @@ export default function EventForm({
       </label>
 
       <label className={styles.field}>
-        <span className={styles.label}>Límite de inscripción</span>
+        <span className={styles.label}>Fin *</span>
         <input
           className={styles.input}
           type="datetime-local"
-          name="registration_deadline"
-          value={deadline}
-          onChange={(changeEvent) => setDeadline(changeEvent.target.value)}
+          name="end_at"
+          value={endAt}
+          onChange={(changeEvent) => setEndAt(changeEvent.target.value)}
+          required
         />
       </label>
 

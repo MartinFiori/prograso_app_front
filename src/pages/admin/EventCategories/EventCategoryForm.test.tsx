@@ -71,6 +71,10 @@ describe("EventCategoryForm create", () => {
       screen.getByLabelText("Descripción"),
       "Eventos de cancha abierta",
     );
+    await userEvent.selectOptions(
+      screen.getByLabelText("Modalidad de inscripción"),
+      "2",
+    );
 
     const file = new File([new Uint8Array([0xff, 0xd8, 0xff])], "prueba.jpg", {
       type: "image/jpeg",
@@ -90,6 +94,7 @@ describe("EventCategoryForm create", () => {
     expect(options.body).toBeInstanceOf(FormData);
     const form = options.body as FormData;
     expect(form.get("name")).toBe("Cancha abierta");
+    expect(form.get("participants_per_registration")).toBe("2");
     expect(form.get("image")).toBeInstanceOf(File);
     const headers = new Headers(options.headers);
     expect(headers.get("Content-Type")).not.toBe("application/json");

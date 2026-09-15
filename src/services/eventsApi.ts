@@ -130,6 +130,11 @@ export function registerForEventPath(eventId: number): string {
   return `/events/${eventId}/registrations`;
 }
 
+export function searchPlayersPath(query: string): string {
+  const params = new URLSearchParams({ q: query.trim() });
+  return `/players?${params.toString()}`;
+}
+
 export function getMyRegistrationPath(eventId: number): string {
   return `/events/${eventId}/registrations/me`;
 }

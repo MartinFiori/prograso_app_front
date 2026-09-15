@@ -81,7 +81,7 @@ describe("LegacyEventRedirect", () => {
           category_id: 2,
           title: "Encuentro del viernes",
           starts_at: "2026-09-04T21:00:00.000Z",
-          registration_deadline: null,
+          end_at: "2026-09-04T23:00:00.000Z",
           capacity: 16,
           price: 15000,
           status_code: "open",

@@ -188,6 +188,33 @@
   width: 100%;
 }
 
+.iconOnly {
+  width: var(--button-height-md);
+  min-width: var(--button-height-md);
+  padding: 0;
+
+  &.sm {
+    width: var(--button-height-sm);
+    min-width: var(--button-height-sm);
+  }
+
+  &.lg {
+    width: var(--button-height-lg);
+    min-width: var(--button-height-lg);
+  }
+}
+
+.iconOnlyContent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 1.15em;
+    height: 1.15em;
+  }
+}
+
 .loading {
   cursor: wait;
 }
