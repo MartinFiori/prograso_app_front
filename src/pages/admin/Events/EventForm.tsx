@@ -1,37 +1,38 @@
 import { FormEvent, useEffect, useState } from "react";
 
 import { Button } from "../../../components/Button/Button";
-import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
 import {
-  useAdminEventDetail,
   useAdminEventMutations,
   useEventFormLookups,
 } from "../../../hooks/useAdminEvents";
-import type { CreateEventBody } from "../../../types/admin";
+import type { AdminEvent, CreateEventBody } from "../../../types/admin";
 import {
   datetimeLocalToIso,
   isoToDatetimeLocal,
 } from "../../../utils/datetimeLocal";
 import styles from "../adminShared.module.scss";
 
-interface EventFormProps {
-  mode: "create" | "edit";
-  eventId?: number;
-  onSaved: () => void;
+type EventFormProps = {
+  mode: "create";
+  event?: never;
+  onSaved: (event: AdminEvent) => void;
   onCancel: () => void;
   onBusyChange?: (busy: boolean) => void;
-}
+} | {
+  mode: "edit";
+  event: AdminEvent;
+  onSaved: (event: AdminEvent) => void;
+  onCancel: () => void;
+  onBusyChange?: (busy: boolean) => void;
+};
 
 export default function EventForm({
   mode,
-  eventId,
+  event,
   onSaved,
   onCancel,
   onBusyChange,
 }: EventFormProps) {
-  const detail = useAdminEventDetail(
-    mode === "edit" && eventId != null ? String(eventId) : undefined,
-  );
   const { create, update } = useAdminEventMutations();
   const lookups = useEventFormLookups();
 
@@ -46,11 +47,10 @@ export default function EventForm({
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (mode !== "edit" || detail.state.status !== "success") {
+    if (mode !== "edit") {
       return;
     }
 
-    const event = detail.state.event;
     setTitle(event.title);
     setCategoryId(String(event.category_id));
     setStartsAt(isoToDatetimeLocal(event.starts_at));
@@ -58,10 +58,11 @@ export default function EventForm({
     setCapacity(String(event.capacity));
     setPrice(String(event.price));
     setStatusCode(event.status_code);
-  }, [mode, detail.state]);
+    setError(null);
+  }, [event, mode]);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleSubmit(formEvent: FormEvent<HTMLFormElement>) {
+    formEvent.preventDefault();
     const trimmedTitle = title.trim();
     const parsedCategory = Number(categoryId);
     const parsedCapacity = Number(capacity);
@@ -107,9 +108,7 @@ export default function EventForm({
     const result =
       mode === "create"
         ? await create(body)
-        : detail.id === null
-          ? { error: "Identificador inválido." }
-          : await update(detail.id, body);
+        : await update(event.id, body);
 
     setSaving(false);
     onBusyChange?.(false);
@@ -119,33 +118,9 @@ export default function EventForm({
       return;
     }
 
-    onSaved();
-  }
-
-  if (mode === "edit" && detail.state.status === "loading") {
-    return <PadelLoader label="Cargando evento..." />;
-  }
-
-  if (mode === "edit" && detail.state.status === "invalid-id") {
-    return <p className={styles.error}>Evento no válido</p>;
-  }
-
-  if (mode === "edit" && detail.state.status === "not-found") {
-    return <p className={styles.error}>Evento no encontrado</p>;
-  }
-
-  if (mode === "edit" && detail.state.status === "error") {
-    return (
-      <div>
-        <p
-          className={styles.error}
-          role="alert"
-        >
-          {detail.state.message}
-        </p>
-        <Button onClick={() => void detail.reload()}>Reintentar</Button>
-      </div>
-    );
+    if (result.event) {
+      onSaved(result.event);
+    }
   }
 
   return (

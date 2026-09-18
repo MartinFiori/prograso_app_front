@@ -1,17 +1,15 @@
 import { useState } from "react";
-import { FiEdit2, FiEye, FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 import { Button } from "../../../components/Button/Button";
-import {
-  DescriptionList,
-  emptyDisplay,
-} from "../../../components/DescriptionList/DescriptionList";
+import { emptyDisplay } from "../../../components/DescriptionList/DescriptionList";
 import { Modal } from "../../../components/Modal/Modal";
 import { PadelLoader } from "../../../components/PadelLoader/PadelLoader";
 import { useAdminEventList } from "../../../hooks/useAdminEvents";
 import type { AdminEvent } from "../../../types/admin";
-import { formatEventDateTime, formatPrice } from "../../../utils/eventDisplay";
+import { formatEventDateTime } from "../../../utils/eventDisplay";
 import { ResourcePager } from "../ResourcePager";
+import { EventRosterPanel } from "../Registrations/EventRosterPanel";
 import styles from "../adminShared.module.scss";
 import EventForm from "./EventForm";
 
@@ -25,8 +23,7 @@ export default function EventsList() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [formBusy, setFormBusy] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
-  const [detail, setDetail] = useState<AdminEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<AdminEvent | null>(null);
 
   async function handleRemove(event: AdminEvent) {
     setRemoving(true);
@@ -145,19 +142,9 @@ export default function EventsList() {
                               size="sm"
                               variant="secondary"
                               iconOnly
-                              aria-label="Ver detalles"
-                              title="Ver detalles"
-                              onClick={() => setDetail(event)}
-                            >
-                              <FiEye aria-hidden="true" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              iconOnly
-                              aria-label="Editar"
-                              title="Editar"
-                              onClick={() => setEditId(event.id)}
+                              aria-label="Ver/editar"
+                              title="Ver/editar"
+                              onClick={() => setSelectedEvent(event)}
                             >
                               <FiEdit2 aria-hidden="true" />
                             </Button>
@@ -218,56 +205,31 @@ export default function EventsList() {
       </Modal>
 
       <Modal
-        open={editId != null}
-        title="Editar evento"
-        onClose={() => setEditId(null)}
+        open={selectedEvent != null}
+        title="Ver/editar evento"
+        onClose={() => setSelectedEvent(null)}
         busy={formBusy}
       >
-        {editId != null ? (
-          <EventForm
-            mode="edit"
-            eventId={editId}
-            onBusyChange={setFormBusy}
-            onCancel={() => setEditId(null)}
-            onSaved={() => {
-              setEditId(null);
-              setStatusMessage("Evento actualizado.");
-              void reload();
-            }}
-          />
-        ) : null}
-      </Modal>
-
-      <Modal
-        open={detail != null}
-        title={detail?.title ?? "Detalle"}
-        onClose={() => setDetail(null)}
-      >
-        {detail ? (
-          <DescriptionList
-            items={[
-              { label: "Id", value: emptyDisplay(detail.id) },
-              { label: "Título", value: detail.title },
-              { label: "Categoría", value: emptyDisplay(detail.category?.name) },
-              { label: "Inicio", value: formatEventDateTime(detail.starts_at) },
-              {
-                label: "Fin",
-                value: formatEventDateTime(detail.end_at),
-              },
-              { label: "Cupo", value: emptyDisplay(detail.capacity) },
-              { label: "Precio", value: formatPrice(detail.price) },
-              { label: "Estado", value: detail.status_code },
-              { label: "Creado por", value: emptyDisplay(detail.created_by) },
-              {
-                label: "Creado",
-                value: formatEventDateTime(detail.created_at),
-              },
-              {
-                label: "Actualizado",
-                value: formatEventDateTime(detail.updated_at),
-              },
-            ]}
-          />
+        {selectedEvent ? (
+          <div key={selectedEvent.id}>
+            <EventForm
+              key={`form-${selectedEvent.id}`}
+              mode="edit"
+              event={selectedEvent}
+              onBusyChange={setFormBusy}
+              onCancel={() => setSelectedEvent(null)}
+              onSaved={(savedEvent) => {
+                setSelectedEvent(savedEvent);
+                setStatusMessage("Evento actualizado.");
+                void reload();
+              }}
+            />
+            <EventRosterPanel
+              key={`roster-${selectedEvent.id}`}
+              event={selectedEvent}
+              onChanged={() => void reload()}
+            />
+          </div>
         ) : null}
       </Modal>
     </main>

@@ -4,7 +4,6 @@ import {
   FiCalendar,
   FiChevronLeft,
   FiChevronRight,
-  FiClipboard,
   FiFileText,
   FiGrid,
   FiList,
@@ -22,7 +21,6 @@ const SIDEBAR_TITLE_ID = "admin-sidebar-title";
 export const ADMIN_TABS = [
   { to: "/admin/categorias", label: "Categorías", icon: FiGrid },
   { to: "/admin/eventos", label: "Eventos", icon: FiCalendar },
-  { to: "/admin/inscripciones", label: "Inscripciones", icon: FiClipboard },
   { to: "/admin/usuarios", label: "Usuarios", icon: FiUsers },
   { to: "/admin/estados-evento", label: "Estados de evento", icon: FiList },
   {

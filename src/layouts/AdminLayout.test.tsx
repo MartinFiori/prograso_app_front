@@ -32,7 +32,7 @@ describe("AdminLayout", () => {
     document.body.style.overflow = "";
   });
 
-  test("names the admin area and current destination with seven unchanged tabs", () => {
+  test("shows Eventos as the sole event and registration destination", () => {
     renderLayout("/admin/eventos");
 
     const nav = screen.getByRole("navigation", { name: "Backoffice" });
@@ -43,13 +43,18 @@ describe("AdminLayout", () => {
     expect(screen.getAllByText("Administración")).toHaveLength(2);
     expect(screen.getAllByText("Eventos")).toHaveLength(3);
     expect(screen.getByRole("button", { name: "Menú" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cerrar" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Cerrar panel lateral" }),
+    ).toBeInTheDocument();
 
     for (const tab of ADMIN_TABS) {
       expect(screen.getByRole("link", { name: tab.label })).toBeInTheDocument();
     }
 
-    expect(ADMIN_TABS).toHaveLength(7);
+    expect(ADMIN_TABS).toHaveLength(6);
+    expect(
+      screen.queryByRole("link", { name: "Inscripciones" }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /exercises/i })).not.toBeInTheDocument();
   });
 

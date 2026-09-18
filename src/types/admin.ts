@@ -5,6 +5,7 @@ export type AdminEvent = PublicEvent & {
   created_at: string;
   updated_at: string;
   category: EventCategoryEmbed;
+  registered_count: number;
 };
 
 export type CreateEventBody = {

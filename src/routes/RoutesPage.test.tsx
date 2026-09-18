@@ -124,4 +124,40 @@ describe("RoutesPage public redirects", () => {
     expect(await screen.findByRole("button", { name: "+ Crear evento" })).toBeInTheDocument();
     expect(await screen.findByText("Borrador interno")).toBeInTheDocument();
   });
+
+  test.each(["/admin/inscripciones", "/admin/inscripciones/abc", "/admin/inscripciones/12"])(
+    "redirects legacy registration URL %s to the events list without opening a modal",
+    async (path) => {
+      mockSecurity.isAuthenticated = true;
+      mockSecurity.isAdmin = true;
+      const requests: string[] = [];
+
+      global.fetch = jest.fn((input: RequestInfo | URL) => {
+        const url = String(input);
+        requests.push(url);
+
+        if (url.includes("/admin/events")) {
+          return jsonResponse({
+            status: "success",
+            statusCode: 200,
+            description: "OK",
+            data: [],
+            pagination: { page: 1, limit: 20, total: 0, total_pages: 1 },
+          });
+        }
+
+        return jsonResponse({ status: "error" }, 500);
+      }) as unknown as typeof fetch;
+
+      render(
+        <MemoryRouter initialEntries={[path]}>
+          <RoutesPage />
+        </MemoryRouter>,
+      );
+
+      expect(await screen.findByRole("heading", { name: "Eventos" })).toBeInTheDocument();
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(requests.some((url) => url.includes("/registrations"))).toBe(false);
+    },
+  );
 });

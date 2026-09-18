@@ -19,9 +19,6 @@ const EventCategoriesList = lazy(
   () => import("../pages/admin/EventCategories/EventCategoriesList"),
 );
 const EventsList = lazy(() => import("../pages/admin/Events/EventsList"));
-const RegistrationsPage = lazy(
-  () => import("../pages/admin/Registrations/RegistrationsPage"),
-);
 const UsersList = lazy(() => import("../pages/admin/Users/UsersList"));
 const EventStatusesPage = lazy(
   () => import("../pages/admin/EventStatuses/EventStatusesPage"),
@@ -142,11 +139,21 @@ export default function RoutesPage() {
             />
             <Route
               path="inscripciones"
-              element={<RegistrationsPage />}
+              element={
+                <Navigate
+                  to="/admin/eventos"
+                  replace
+                />
+              }
             />
             <Route
               path="inscripciones/:eventId"
-              element={<RegistrationsPage />}
+              element={
+                <Navigate
+                  to="/admin/eventos"
+                  replace
+                />
+              }
             />
             <Route
               path="usuarios"
